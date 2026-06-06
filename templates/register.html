@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="auth-orb orb-left"></div>
+    <div class="auth-orb orb-right"></div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="auth-card">
+
+                    <div class="text-center mb-4 auth-head">
+                        <div class="auth-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h2>Create Account</h2>
+                        <p>Join our community for better health awareness</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('auth.register') }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Username</label>
+                            <div class="input-group auth-input">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control" name="username" required placeholder="Choose a username">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email address</label>
+                            <div class="input-group auth-input">
+                                <span class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input type="email" class="form-control" name="email" required placeholder="Enter your email">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Preferred Language</label>
+                            <select class="form-select auth-select" name="language">
+                                <option value="en" selected>English</option>
+                                <option value="hi">Hindi (हिन्दी)</option>
+                                <option value="ta">Tamil (தமிழ்)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Password</label>
+                            <div class="input-group auth-input">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" class="form-control" name="password" required placeholder="Create a password">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="auth-btn">Sign Up</button>
+                    </form>
+
+                    <div class="or-divider">
+                        <span>or</span>
+                    </div>
+
+                    <a href="{{ url_for('auth.google_login') }}" class="google-btn">
+                        <img
+                            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                            alt="Google"
+                            class="google-logo">
+                        <span>Continue with Google</span>
+                    </a>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-0">
+                            Already have an account?
+                            <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold">
+                                Login here
+                            </a>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.auth-page{
+    min-height:calc(100vh - 150px);
+    display:flex;
+    align-items:center;
+    position:relative;
+    overflow:hidden;
+    padding:70px 0;
+    background:
+        radial-gradient(circle at 15% 70%, rgba(20,184,166,.35), transparent 35%),
+        radial-gradient(circle at 85% 20%, rgba(37,99,235,.35), transparent 38%),
+        linear-gradient(135deg,#eefbff,#ffffff 48%,#eef4ff);
+}
+
+.auth-orb{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(70px);
+    opacity:.45;
+    animation:orbMove 7s ease-in-out infinite alternate;
+}
+
+.orb-left{
+    width:320px;
+    height:320px;
+    background:#14b8a6;
+    left:-90px;
+    bottom:80px;
+}
+
+.orb-right{
+    width:380px;
+    height:380px;
+    background:#2563eb;
+    right:-120px;
+    top:60px;
+    animation-delay:1s;
+}
+
+.auth-card{
+    position:relative;
+    z-index:2;
+    padding:38px;
+    border-radius:28px;
+    background:rgba(255,255,255,0.78);
+    border:1px solid rgba(255,255,255,0.85);
+    box-shadow:
+        0 25px 70px rgba(15,23,42,0.12),
+        0 0 35px rgba(37,99,235,0.08);
+    backdrop-filter:blur(22px);
+    animation:authReveal .8s ease both;
+}
+
+.auth-icon{
+    width:82px;
+    height:82px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,#14b8a6,#2563eb);
+    color:white;
+    font-size:40px;
+    box-shadow:0 16px 40px rgba(37,99,235,.28);
+    animation:iconPulse 2.5s ease-in-out infinite;
+}
+
+.auth-head h2{
+    font-weight:950;
+    color:#0f172a;
+}
+
+.auth-head p{
+    color:#64748b;
+    font-weight:600;
+}
+
+.auth-input .input-group-text{
+    border:none;
+    background:#f1f5f9;
+    border-radius:16px 0 0 16px;
+}
+
+.auth-input .form-control{
+    height:54px;
+    border:none;
+    background:#f8fafc;
+    border-radius:0 16px 16px 0;
+    font-weight:600;
+}
+
+.auth-input .form-control:focus,
+.auth-select:focus{
+    box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+}
+
+.auth-select{
+    height:54px;
+    border:none;
+    background:#f8fafc;
+    border-radius:16px;
+    font-weight:600;
+}
+
+.auth-btn{
+    width:100%;
+    height:52px;
+    border:none;
+    border-radius:999px;
+    color:white;
+    font-weight:900;
+    background:linear-gradient(135deg,#14b8a6,#2563eb);
+    box-shadow:0 16px 35px rgba(37,99,235,.28);
+    transition:.3s ease;
+}
+
+.auth-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 20px 45px rgba(37,99,235,.38);
+}
+
+.or-divider{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:20px 0;
+    color:#94a3b8;
+    font-weight:800;
+}
+
+.or-divider::before,
+.or-divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:#e5e7eb;
+}
+
+.google-btn{
+    width:100%;
+    height:52px;
+    border-radius:999px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    color:#172033;
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    text-decoration:none;
+    box-shadow:0 12px 28px rgba(15,23,42,.08);
+    transition:.3s ease;
+}
+
+.google-btn:hover{
+    background:#f8fafc;
+    color:#172033;
+    transform:translateY(-2px);
+}
+
+.google-logo{
+    width:22px;
+    height:22px;
+    object-fit:contain;
+}
+
+@keyframes authReveal{
+    from{
+        opacity:0;
+        transform:translateY(45px) scale(.94);
+        filter:blur(12px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+        filter:blur(0);
+    }
+}
+
+@keyframes orbMove{
+    from{
+        transform:translate(0,0) scale(1);
+    }
+    to{
+        transform:translate(40px,-35px) scale(1.08);
+    }
+}
+
+@keyframes iconPulse{
+    0%,100%{
+        transform:scale(1);
+    }
+    50%{
+        transform:scale(1.06);
+    }
+}
+</style>
+{% endblock %}

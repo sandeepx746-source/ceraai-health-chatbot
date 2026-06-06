@@ -1,0 +1,404 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="hero-section text-center position-relative overflow-hidden py-5">
+    <div class="hero-overlay"></div>
+
+    <div class="floating-orb orb1"></div>
+    <div class="floating-orb orb2"></div>
+    <div class="floating-orb orb3"></div>
+
+    <div class="container position-relative z-index-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 page-open">
+
+                <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-bold hero-badge">
+                    Next-Generation Health Assistant
+                </span>
+
+                <h1 class="hero-title">
+                    Meet <span>CeraAI</span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    AI-powered healthcare guidance, symptom analysis, and disease awareness —
+                    available anytime, anywhere.
+                </p>
+
+                <div class="hero-actions d-flex justify-content-center gap-3 flex-wrap">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('views.chatbot') }}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow">
+                            <i class="fas fa-comment-medical me-2"></i> Start Consultation
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow">
+                            Get Started Free
+                        </a>
+
+                        <a href="{{ url_for('views.disease_awareness') }}" class="btn btn-outline-secondary btn-lg px-5 py-3 rounded-pill hero-outline-btn">
+                            Explore
+                        </a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5 py-5">
+    <div class="text-center mb-5 pb-3">
+        <h2 class="fw-bold display-6 mb-3">Why Choose CeraAI?</h2>
+        <p class="text-muted lead mx-auto" style="max-width: 700px;">
+            CeraAI delivers intelligent, empathetic, and multilingual healthcare assistance anytime, anywhere.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 p-4 border-0 bg-light rounded-4 shadow-sm feature-card transition-all">
+                <div class="card-body">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mb-4 shadow" style="width: 60px; height: 60px;">
+                        <i class="fas fa-language fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Multilingual</h4>
+                    <p class="text-secondary mb-0">Chat natively in English, Hindi, or Tamil.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 p-4 border-0 bg-light rounded-4 shadow-sm feature-card transition-all">
+                <div class="card-body">
+                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center mb-4 shadow" style="width: 60px; height: 60px;">
+                        <i class="fas fa-shield-virus fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Awareness</h4>
+                    <p class="text-secondary mb-0">Stay informed about prevention and healthy habits.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 p-4 border-0 bg-light rounded-4 shadow-sm feature-card transition-all">
+                <div class="card-body">
+                    <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center mb-4 shadow" style="width: 60px; height: 60px;">
+                        <i class="fas fa-microphone-alt fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Voice Input</h4>
+                    <p class="text-secondary mb-0">Use voice recognition for hands-free queries.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 p-4 border-0 bg-light rounded-4 shadow-sm feature-card transition-all">
+                <div class="card-body">
+                    <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center mb-4 shadow" style="width: 60px; height: 60px;">
+                        <i class="fas fa-brain fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Smart Context</h4>
+                    <p class="text-secondary mb-0">Supports natural multi-turn conversations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hero-section {
+    min-height: 82vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(circle at 15% 65%, rgba(20,184,166,0.45), transparent 38%),
+        radial-gradient(circle at 88% 20%, rgba(37,99,235,0.45), transparent 40%),
+        linear-gradient(135deg, #e9fbff 0%, #ffffff 52%, #eef4ff 100%) !important;
+    background-size: 120% 120%;
+    animation: bgMove 8s ease-in-out infinite alternate;
+    perspective: 1500px;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.65), transparent);
+    transform: translateX(-100%);
+    animation: heroScan 1.2s ease-out 1;
+    pointer-events: none;
+}
+
+.floating-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(22px);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.orb1 {
+    width: 130px;
+    height: 130px;
+    background: #14b8a6;
+    left: 10%;
+    top: 30%;
+    opacity: .24;
+    animation: floatOrb 6.5s ease-in-out infinite;
+}
+
+.orb2 {
+    width: 190px;
+    height: 190px;
+    background: #2563eb;
+    right: 8%;
+    top: 20%;
+    opacity: .22;
+    animation: floatOrb 7.5s ease-in-out infinite reverse;
+}
+
+.orb3 {
+    width: 95px;
+    height: 95px;
+    background: #8b5cf6;
+    left: 50%;
+    bottom: 14%;
+    opacity: .14;
+    animation: floatOrb 6s ease-in-out infinite;
+}
+
+.page-open {
+    animation: visionZoom 1.2s cubic-bezier(.16,1,.3,1) both;
+    transform-origin: center;
+}
+
+.hero-badge {
+    animation: badgeDrop .8s .2s ease both;
+}
+
+.hero-title {
+    font-size: clamp(48px, 5vw, 70px);
+    font-weight: 950;
+    line-height: 1.05;
+    color: #0f172a;
+    margin-bottom: 24px;
+    letter-spacing: -2px;
+    animation: titleReveal 1s .35s both;
+}
+
+.hero-title span {
+    background: linear-gradient(90deg, #06b6d4, #3b82f6, #2563eb);
+    background-size: 300%;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: gradientMove 5s linear infinite;
+}
+
+.hero-subtitle {
+    max-width: 760px;
+    margin: 0 auto 34px;
+    color: #475569;
+    font-size: 18px;
+    line-height: 1.8;
+    font-weight: 600;
+    animation: subtitleFloat .9s .6s both;
+}
+
+.hero-actions {
+    animation: btnRise .8s .8s both;
+}
+
+.hero-actions a {
+    position: relative;
+    overflow: hidden;
+    animation: btnFloat 2.6s ease-in-out infinite;
+}
+
+.hero-actions a::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 80%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,.65), transparent);
+    animation: shineMove 2.4s ease-in-out infinite;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #14b8a6, #2563eb);
+    border: none;
+}
+
+.hero-outline-btn {
+    background: rgba(255,255,255,0.62);
+    backdrop-filter: blur(10px);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+@keyframes visionZoom {
+    0% {
+        opacity: 0;
+        transform:
+            perspective(1500px)
+            translateZ(-250px)
+            scale(.75);
+        filter: blur(12px) saturate(1.4);
+    }
+
+    60% {
+        opacity: 1;
+        transform:
+            perspective(1500px)
+            translateZ(40px)
+            scale(1.04);
+        filter: blur(2px) saturate(1.2);
+    }
+
+    100% {
+        opacity: 1;
+        transform:
+            perspective(1500px)
+            translateZ(0)
+            scale(1);
+        filter: blur(0) saturate(1);
+    }
+}
+
+@keyframes badgeDrop {
+    from {
+        opacity: 0;
+        transform: translateY(-45px) scale(.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes titleReveal {
+    0% {
+        opacity: 0;
+        letter-spacing: -25px;
+        transform: scale(.75);
+    }
+
+    50% {
+        opacity: 1;
+        letter-spacing: 12px;
+        transform: scale(1.08);
+    }
+
+    100% {
+        opacity: 1;
+        letter-spacing: -2px;
+        transform: scale(1);
+    }
+}
+
+@keyframes subtitleFloat {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes btnRise {
+    0% {
+        opacity: 0;
+        transform: translateY(60px) scale(.9);
+    }
+    70% {
+        opacity: 1;
+        transform: translateY(-8px) scale(1.04);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes floatOrb {
+    0%, 100% {
+        transform: translateY(0) translateX(0) scale(1);
+    }
+    50% {
+        transform: translateY(-24px) translateX(16px) scale(1.05);
+    }
+}
+
+@keyframes heroScan {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes bgMove {
+    0% {
+        background-position: left top;
+    }
+    100% {
+        background-position: right bottom;
+    }
+}
+
+@keyframes gradientMove {
+    from {
+        background-position: 0%;
+    }
+    to {
+        background-position: 300%;
+    }
+}
+
+@keyframes btnFloat {
+    0%,100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes shineMove {
+    0% {
+        left: -120%;
+    }
+    55%,100% {
+        left: 130%;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 75vh;
+        padding: 70px 0;
+    }
+
+    .hero-title {
+        font-size: 46px;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
+    }
+}
+</style>
+
+{% endblock %}

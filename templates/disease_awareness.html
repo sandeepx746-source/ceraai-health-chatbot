@@ -1,0 +1,729 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="health-dashboard">
+    <div class="dash-orb orb-one"></div>
+    <div class="dash-orb orb-two"></div>
+
+    <div class="container py-5">
+        <div class="dashboard-hero text-center mb-5">
+            <span class="dash-badge">Personal Health Dashboard</span>
+            <h1 class="dash-title">Track Your Daily Wellness</h1>
+            <p class="dash-subtitle">
+                Calculate BMI, monitor sleep, check calories, and choose your body goal.
+            </p>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="dash-card bmi-card">
+                    <div class="card-head">
+                        <div class="dash-icon bmi-icon">
+                            <i class="fas fa-weight-scale"></i>
+                        </div>
+                        <div>
+                            <h3>BMI Calculator</h3>
+                            <p>Enter your height and weight</p>
+                        </div>
+                    </div>
+
+                    <div class="input-grid">
+                        <div>
+                            <label>Height (cm)</label>
+                            <input type="number" id="heightInput" placeholder="Example: 175">
+                        </div>
+
+                        <div>
+                            <label>Weight (kg)</label>
+                            <input type="number" id="weightInput" placeholder="Example: 60">
+                        </div>
+                    </div>
+
+                    <button class="dash-btn" onclick="calculateBMI()">Calculate BMI</button>
+
+                    <div class="result-box">
+                        <strong id="bmiValue">--</strong>
+                        <span id="bmiStatus">Your BMI result will appear here</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="dash-card wellness-card">
+                    <div class="card-head">
+                        <div class="dash-icon wellness-icon">
+                            <i class="fas fa-heart-pulse"></i>
+                        </div>
+                        <div>
+                            <h3>Health & Wellness Score</h3>
+                            <p>Your overall health overview</p>
+                        </div>
+                    </div>
+
+                    <div class="wellness-content">
+                        <div class="score-circle">
+                            <div>
+                                <h2 id="wellnessScore">82</h2>
+                                <span>/100</span>
+                            </div>
+                        </div>
+
+                        <div class="score-details">
+                            <div class="score-row">
+                                <span><i class="fas fa-moon"></i> Sleep</span>
+                                <div class="bar"><div id="sleepBar" style="width:80%"></div></div>
+                                <b id="sleepScore">80/100</b>
+                            </div>
+
+                            <div class="score-row">
+                                <span><i class="fas fa-utensils"></i> Nutrition</span>
+                                <div class="bar"><div id="nutritionBar" style="width:85%"></div></div>
+                                <b id="nutritionScore">85/100</b>
+                            </div>
+
+                            <div class="score-row">
+                                <span><i class="fas fa-person-running"></i> Activity</span>
+                                <div class="bar"><div id="activityBar" style="width:75%"></div></div>
+                                <b id="activityScore">75/100</b>
+                            </div>
+
+                            <div class="score-row">
+                                <span><i class="fas fa-droplet"></i> Hydration</span>
+                                <div class="bar"><div id="hydrationBar" style="width:90%"></div></div>
+                                <b id="hydrationScore">90/100</b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wellness-status">
+                        <b id="wellnessStatus">Good</b>
+                        <p>Keep up the good work!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="dash-card small-card">
+                    <div class="card-head">
+                        <div class="dash-icon sleep-icon">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div>
+                            <h3>Sleep Tracker</h3>
+                            <p>Recommended: 7-9 hours</p>
+                        </div>
+                    </div>
+
+                    <label>Hours slept</label>
+                    <input type="number" id="sleepInput" placeholder="Example: 7">
+
+                    <button class="mini-btn" onclick="checkSleep()">Check Sleep</button>
+
+                    <div class="mini-result" id="sleepResult">Enter your sleep hours</div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="dash-card small-card">
+                    <div class="card-head">
+                        <div class="dash-icon calorie-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div>
+                            <h3>Calories</h3>
+                            <p>Simple daily calorie check</p>
+                        </div>
+                    </div>
+
+                    <label>Calories consumed</label>
+                    <input type="number" id="calorieInput" placeholder="Example: 1800">
+
+                    <button class="mini-btn" onclick="checkCalories()">Check Calories</button>
+
+                    <div class="mini-result" id="calorieResult">Enter your calories</div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="dash-card small-card goal-card">
+                    <div class="card-head">
+                        <div class="dash-icon goal-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div>
+                            <h3>Body Goal</h3>
+                            <p>Bulking or fat cut guidance</p>
+                        </div>
+                    </div>
+
+                    <label>Select Goal</label>
+                    <select id="goalInput">
+                        <option value="">Choose your goal</option>
+                        <option value="bulk">Bulking</option>
+                        <option value="cut">Fat Cut</option>
+                    </select>
+
+                    <button type="button" class="mini-btn" onclick="checkGoal()">Check Goal</button>
+
+                    <div class="mini-result goal-result" id="goalResult">
+                        Select your body goal
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       <div class="tips-panel mt-5">
+    <div>
+        <h3><i class="fas fa-lightbulb"></i> Today’s Health Tip</h3>
+        <p id="dailyTip">
+            Drink water regularly, avoid skipping meals, and take short walks between study or work sessions.
+        </p>
+    </div>
+
+    <button class="tip-btn" onclick="newTip()">
+        <i class="fas fa-rotate"></i> New Tip
+    </button>
+</div>
+</section>
+
+<style>
+.health-dashboard {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 8% 18%, rgba(94,231,197,0.25), transparent 32%),
+        radial-gradient(circle at 88% 20%, rgba(98,168,255,0.25), transparent 34%),
+        linear-gradient(135deg, #f8fbff, #ffffff 55%, #f4fbff);
+}
+
+.dash-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(85px);
+    pointer-events: none;
+    opacity: 0.55;
+}
+
+.orb-one {
+    width: 360px;
+    height: 360px;
+    background: #5ee7c5;
+    left: -100px;
+    bottom: 80px;
+    animation: orbFloat 7s ease-in-out infinite alternate;
+}
+
+.orb-two {
+    width: 420px;
+    height: 420px;
+    background: #62a8ff;
+    right: -120px;
+    top: 120px;
+    animation: orbFloatTwo 8s ease-in-out infinite alternate;
+}
+
+.dashboard-hero {
+    position: relative;
+    z-index: 2;
+    animation: heroReveal 0.9s ease both;
+}
+
+.dash-badge {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(94,231,197,0.16);
+    color: #0f766e;
+    font-weight: 900;
+    margin-bottom: 18px;
+    border: 1px solid rgba(94,231,197,0.32);
+    animation: badgeFloat 3s ease-in-out infinite;
+}
+
+.dash-title {
+    font-size: clamp(46px, 6vw, 78px);
+    font-weight: 950;
+    letter-spacing: -2px;
+    background: linear-gradient(90deg, #14b8a6, #2563eb, #14b8a6);
+    background-size: 220%;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: titleMove 5s linear infinite;
+}
+
+.dash-subtitle {
+    max-width: 760px;
+    margin: 0 auto;
+    color: #667085;
+    font-size: 18px;
+    line-height: 1.7;
+}
+
+.dash-card {
+    height: 100%;
+    padding: 30px;
+    border-radius: 30px;
+    background: rgba(255,255,255,0.84);
+    border: 1px solid rgba(255,255,255,0.92);
+    box-shadow: 0 20px 55px rgba(24,39,75,0.08);
+    backdrop-filter: blur(18px);
+    transition: 0.35s ease;
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+    animation: cardReveal 0.8s ease both;
+}
+
+.bmi-card,
+.wellness-card {
+    min-height: 360px;
+}
+
+.dash-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 80px rgba(24,39,75,0.14);
+}
+
+.card-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.card-head h3 {
+    margin: 0;
+    font-weight: 950;
+    color: #0f172a;
+}
+
+.card-head p {
+    margin: 4px 0 0;
+    color: #667085;
+}
+
+.dash-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.bmi-icon { background: linear-gradient(135deg, #14b8a6, #2563eb); }
+.sleep-icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.calorie-icon { background: linear-gradient(135deg, #f97316, #ef4444); }
+.goal-icon { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.wellness-icon { background: linear-gradient(135deg, #10b981, #22c55e); }
+
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+label {
+    display: block;
+    font-weight: 800;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+input,
+select {
+    width: 100%;
+    height: 54px;
+    border-radius: 18px;
+    border: 1px solid rgba(15,23,42,0.10);
+    background: rgba(255,255,255,0.75);
+    padding: 0 16px;
+    outline: none;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+input:focus,
+select:focus {
+    border-color: #5ee7c5;
+    box-shadow: 0 0 0 4px rgba(94,231,197,0.16);
+}
+
+.dash-btn,
+.mini-btn {
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #5ee7c5, #2563eb);
+    color: white;
+    font-weight: 900;
+    min-height: 48px;
+    padding: 0 18px;
+    margin-top: 18px;
+    box-shadow: 0 14px 30px rgba(94,231,197,0.26);
+    transition: 0.25s ease;
+}
+
+.dash-btn:hover,
+.mini-btn:hover {
+    transform: translateY(-4px);
+}
+
+.result-box {
+    margin-top: 22px;
+    padding: 22px;
+    border-radius: 22px;
+    background: rgba(94,231,197,0.12);
+    border: 1px solid rgba(94,231,197,0.24);
+}
+
+.result-box strong {
+    display: block;
+    font-size: 38px;
+    color: #0f172a;
+}
+
+.result-box span {
+    color: #475467;
+    font-weight: 800;
+}
+
+.wellness-content {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.score-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: conic-gradient(#22c55e 0deg 295deg, #e8eef5 295deg 360deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.score-circle::before {
+    content: "";
+    width: 114px;
+    height: 114px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.score-circle div {
+    position: relative;
+    text-align: center;
+}
+
+.score-circle h2 {
+    font-size: 42px;
+    margin: 0;
+    color: #071233;
+    font-weight: 950;
+}
+
+.score-circle span {
+    font-weight: 800;
+    color: #64748b;
+}
+
+.score-details {
+    flex: 1;
+}
+
+.score-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 65px;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.score-row span {
+    font-weight: 800;
+    color: #334155;
+}
+
+.score-row i {
+    color: #0ea5e9;
+    margin-right: 7px;
+}
+
+.bar {
+    height: 8px;
+    background: #e8eef5;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.bar div {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #38bdf8);
+    border-radius: 20px;
+}
+
+.score-row b {
+    font-size: 13px;
+    color: #0f172a;
+}
+
+.wellness-status {
+    margin-top: 18px;
+    text-align: center;
+}
+
+.wellness-status b {
+    color: #22c55e;
+    font-size: 16px;
+}
+
+.wellness-status p {
+    margin: 4px 0 0;
+    color: #667085;
+    font-weight: 700;
+}
+
+.small-card {
+    min-height: 290px;
+}
+
+.small-card p {
+    color: #667085;
+    line-height: 1.7;
+}
+
+.mini-result {
+    margin-top: 18px;
+    padding: 15px;
+    border-radius: 18px;
+    background: rgba(15,23,42,0.04);
+    color: #475467;
+    font-weight: 800;
+    line-height: 1.6;
+}
+
+.goal-result {
+    min-height: 170px;
+}
+
+.tips-panel {
+    position: relative;
+    z-index: 2;
+    padding: 28px;
+    border-radius: 30px;
+    background: rgba(255,255,255,0.84);
+    border: 1px solid rgba(255,255,255,0.92);
+    box-shadow: 0 20px 55px rgba(24,39,75,0.08);
+    backdrop-filter: blur(18px);
+}
+
+.tips-panel h3 {
+    font-weight: 950;
+    color: #0f172a;
+}
+
+.tips-panel p {
+    margin: 0;
+    color: #667085;
+}
+
+@keyframes heroReveal {
+    from { opacity: 0; transform: translateY(30px) scale(0.96); filter: blur(12px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes badgeFloat {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+}
+
+@keyframes titleMove {
+    from { background-position: 0%; }
+    to { background-position: 220%; }
+}
+
+@keyframes cardReveal {
+    from { opacity: 0; transform: translateY(38px) scale(0.94); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes orbFloat {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(60px, -40px) scale(1.12); }
+}
+
+@keyframes orbFloatTwo {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(-50px, 40px) scale(1.1); }
+}
+
+@media (max-width: 992px) {
+    .wellness-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .score-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .input-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-title {
+        font-size: 42px;
+    }
+}
+</style>
+
+<script>
+function calculateBMI() {
+    const height = Number(document.getElementById("heightInput").value);
+    const weight = Number(document.getElementById("weightInput").value);
+
+    if (!height || !weight) {
+        document.getElementById("bmiValue").innerText = "--";
+        document.getElementById("bmiStatus").innerText = "Please enter height and weight";
+        return;
+    }
+
+    const meter = height / 100;
+    const bmi = weight / (meter * meter);
+    const rounded = bmi.toFixed(1);
+
+    let status = "Normal range";
+
+    if (bmi < 18.5) status = "Underweight range";
+    else if (bmi >= 25 && bmi < 30) status = "Overweight range";
+    else if (bmi >= 30) status = "Obesity range";
+
+    document.getElementById("bmiValue").innerText = rounded;
+    document.getElementById("bmiStatus").innerText = status;
+}
+
+function updateWellnessScore() {
+    const sleep = Number(document.getElementById("sleepInput").value) || 7;
+    const calories = Number(document.getElementById("calorieInput").value) || 1800;
+
+    let sleepScore = sleep >= 7 && sleep <= 9 ? 90 : sleep >= 6 && sleep <= 10 ? 75 : 55;
+    let nutritionScore = calories >= 1500 && calories <= 2500 ? 85 : 60;
+    let activityScore = 75;
+    let hydrationScore = 90;
+
+    let total = Math.round((sleepScore + nutritionScore + activityScore + hydrationScore) / 4);
+
+    document.getElementById("wellnessScore").innerText = total;
+    document.getElementById("sleepScore").innerText = sleepScore + "/100";
+    document.getElementById("nutritionScore").innerText = nutritionScore + "/100";
+    document.getElementById("activityScore").innerText = activityScore + "/100";
+    document.getElementById("hydrationScore").innerText = hydrationScore + "/100";
+
+    document.getElementById("sleepBar").style.width = sleepScore + "%";
+    document.getElementById("nutritionBar").style.width = nutritionScore + "%";
+    document.getElementById("activityBar").style.width = activityScore + "%";
+    document.getElementById("hydrationBar").style.width = hydrationScore + "%";
+
+    const degree = Math.round((total / 100) * 360);
+    document.querySelector(".score-circle").style.background =
+        `conic-gradient(#22c55e 0deg ${degree}deg, #e8eef5 ${degree}deg 360deg)`;
+
+    document.getElementById("wellnessStatus").innerText =
+        total >= 80 ? "Good" : total >= 60 ? "Average" : "Needs Improvement";
+}
+
+function checkSleep() {
+    const sleep = Number(document.getElementById("sleepInput").value);
+    const result = document.getElementById("sleepResult");
+
+    if (!sleep) {
+        result.innerText = "Please enter sleep hours";
+        return;
+    }
+
+    if (sleep < 6) result.innerText = "Low sleep. Try to rest more.";
+    else if (sleep <= 9) result.innerText = "Good sleep routine.";
+    else result.innerText = "Too much sleep. Keep a balanced routine.";
+
+    updateWellnessScore();
+}
+
+function checkCalories() {
+    const calories = Number(document.getElementById("calorieInput").value);
+    const result = document.getElementById("calorieResult");
+
+    if (!calories) {
+        result.innerText = "Please enter calories";
+        return;
+    }
+
+    if (calories < 1500) result.innerText = "Low intake. Eat balanced meals.";
+    else if (calories <= 2500) result.innerText = "Balanced calorie range.";
+    else result.innerText = "High intake. Balance with activity.";
+
+    updateWellnessScore();
+}
+
+function checkGoal() {
+    const goal = document.getElementById("goalInput").value;
+    const result = document.getElementById("goalResult");
+
+    if (goal === "bulk") {
+        result.innerHTML = `
+            <b>Bulking Weekly Plan</b><br>
+            Calories: 2500-2800/day<br>
+            Protein: 80-100g/day<br><br>
+            <b>Workout:</b><br>
+            Mon: Push-ups + Squats<br>
+            Tue: Rows + Core<br>
+            Wed: Rest + Walking<br>
+            Thu: Push-ups + Lunges<br>
+            Fri: Full body workout<br><br>
+            <b>Food:</b> Rice, eggs, milk, chicken/paneer, banana.
+        `;
+    } else if (goal === "cut") {
+        result.innerHTML = `
+            <b>Fat Cut Weekly Plan</b><br>
+            Calories: 1700-2000/day<br>
+            Protein: 80-100g/day<br><br>
+            <b>Workout:</b><br>
+            Mon: Walking 30 mins + Core<br>
+            Tue: Squats + Jumping jacks<br>
+            Wed: Brisk walk 40 mins<br>
+            Thu: Push-ups + Lunges<br>
+            Fri: Full body circuit<br><br>
+            <b>Food:</b> Eggs, dal, chicken/paneer, vegetables, less sugar.
+        `;
+    } else {
+        result.innerText = "Please select your goal.";
+    }
+}
+
+const tips = [
+    "Drink water regularly and avoid skipping meals.",
+    "Take a 5-minute walk after long sitting sessions.",
+    "Sleep at the same time daily for better recovery.",
+    "Eat fruits or protein-rich snacks instead of junk food.",
+    "Avoid self-medication and consult a doctor for serious symptoms."
+];
+
+function newTip() {
+    const random = Math.floor(Math.random() * tips.length);
+    document.getElementById("dailyTip").innerText = tips[random];
+}
+</script>
+{% endblock %}

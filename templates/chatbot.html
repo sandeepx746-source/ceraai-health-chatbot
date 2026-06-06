@@ -1,0 +1,1733 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+<style>
+html, body {
+    height: 100%;
+    overflow: hidden !important;
+}
+
+body:has(.clean-chat-page) .navbar,
+body:has(.clean-chat-page) footer,
+body:has(.clean-chat-page) .container.mt-3 {
+    display: none !important;
+}
+
+.clean-chat-page {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden !important;
+    background:
+        radial-gradient(circle at 82% 18%, rgba(20,184,166,0.18), transparent 34%),
+        radial-gradient(circle at 18% 82%, rgba(59,130,246,0.15), transparent 36%),
+        #f8fafc;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    opacity: 0;
+    transform: translateY(18px) scale(.98);
+}
+
+.clean-chat-page.page-ready {
+    animation: chatPageOpen .75s ease forwards;
+}
+
+@keyframes chatPageOpen {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.futuristic-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.futuristic-bg span {
+    position: absolute;
+    width: 2px;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, rgba(20,184,166,.45), transparent);
+    animation: scanMove 6s linear infinite;
+}
+
+.futuristic-bg span:nth-child(1){ left:18%; animation-delay:0s; }
+.futuristic-bg span:nth-child(2){ left:42%; animation-delay:1.5s; }
+.futuristic-bg span:nth-child(3){ left:66%; animation-delay:3s; }
+.futuristic-bg span:nth-child(4){ left:82%; animation-delay:4.5s; }
+
+@keyframes scanMove {
+    from { top:-160px; opacity:0; }
+    30% { opacity:1; }
+    to { top:100vh; opacity:0; }
+}
+
+.holo-ring {
+    position: fixed;
+    left: 31%;
+    bottom: 215px;
+    width: 420px;
+    height: 120px;
+    border-radius: 50%;
+    border: 2px solid rgba(20,184,166,.32);
+    box-shadow: 0 0 25px rgba(20,184,166,.32), inset 0 0 30px rgba(59,130,246,.18);
+    animation: holoPulse 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 2;
+}
+
+@keyframes holoPulse {
+    0%,100% { transform: scale(.95); opacity: .25; }
+    50% { transform: scale(1.08); opacity: .75; }
+}
+
+.clean-topbar {
+    height: 86px;
+    padding: 24px 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    background: rgba(248,250,252,.82);
+    backdrop-filter: blur(18px);
+}
+
+.clean-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand-orb {
+    width: 46px;
+    height: 46px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    color: white;
+    background: linear-gradient(135deg,#14b8a6,#3b82f6);
+    animation: softGlow 2.5s ease-in-out infinite;
+}
+
+.clean-brand h4 {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.clean-brand span {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+}
+
+.profile-pill,
+.new-chat-top {
+    width: 50px;
+    height: 50px;
+    border-radius: 18px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 8px 20px rgba(15,23,42,.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #0f172a;
+    cursor: pointer;
+}
+
+.profile-pill:hover,
+.new-chat-top:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.voice-top-btn {
+    color: #0f766e;
+}
+
+.simple-profile { padding: 7px !important; }
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-weight: 900;
+    background: linear-gradient(135deg,#14b8a6,#3b82f6);
+}
+
+.plus-menu {
+    position: absolute;
+    top: 60px;
+    right: 126px;
+    width: 165px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 10px;
+    box-shadow: 0 22px 60px rgba(15,23,42,.14);
+    z-index: 1000;
+}
+
+.plus-menu a {
+    width: 100%;
+    background: transparent;
+    padding: 12px 14px;
+    border-radius: 12px;
+    text-align: left;
+    font-weight: 800;
+    color: #0f172a;
+    text-decoration: none;
+    display: block;
+}
+
+.plus-menu a:hover {
+    background: #f1f9ff;
+}
+
+.dropdown-menu {
+    min-width: 150px;
+    padding: 8px;
+}
+
+.dropdown-item {
+    border-radius: 12px;
+    padding: 10px 14px;
+}
+
+.right-panel {
+    position: fixed;
+    top: 120px;
+    right: 30px;
+    width: 300px;
+    z-index: 20;
+}
+
+.right-alert-card,
+.nearby-card {
+    border-radius: 22px;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(226,232,240,.8);
+    box-shadow: 0 18px 40px rgba(15,23,42,.06);
+    animation: cardFloat 4s ease-in-out infinite;
+}
+
+.nearby-card { animation-delay: 1s; }
+.right-alert-card { background: #fff1f1; }
+.nearby-card { background: #eefcf4; }
+
+.right-alert-card b {
+    color: #b91c1c;
+    font-size: 19px;
+    font-weight: 900;
+}
+
+.nearby-card b {
+    color: #047857;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.right-alert-card p,
+.nearby-card p {
+    color: #475569;
+    line-height: 1.7;
+    margin: 14px 0 20px;
+}
+
+.side-action-btn {
+    width: 100%;
+    border: none;
+    background: #fff;
+    padding: 15px;
+    border-radius: 14px;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    text-decoration: none;
+}
+
+.emergency-call { color: #dc2626; }
+.hospital-search { color: #047857; }
+
+#hospital-map {
+    display: none;
+    width: 100%;
+    height: 260px;
+    margin-top: 16px;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.chat-messages {
+    position: fixed;
+    top: 112px;
+    left: 30px;
+    right: 30px;
+    bottom: 155px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 26px 34px 35px;
+    z-index: 4;
+    border: 1px solid rgba(226,232,240,.9);
+    border-radius: 22px;
+    background: rgba(255,255,255,.78);
+    box-shadow: 0 18px 45px rgba(15,23,42,.06);
+    mask-image: linear-gradient(to bottom, black 0%, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 85%, transparent 100%);
+}
+
+.chat-messages-inner {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding-bottom: 10px;
+}
+
+.welcome-state {
+    min-height: 55vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    animation: welcomePop 1s .15s both;
+}
+
+.welcome-icon {
+    width: 82px;
+    height: 82px;
+    border-radius: 24px;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 34px;
+    background: linear-gradient(135deg,#14b8a6,#3b82f6);
+    margin-bottom: 22px;
+    animation: iconDrop 1s ease, softGlow 2.5s ease-in-out infinite;
+}
+
+.welcome-state h1 {
+    margin: 0 0 12px;
+    font-size: 44px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.welcome-state p {
+    margin: 0;
+    color: #64748b;
+    font-size: 17px;
+    max-width: 520px;
+    line-height: 1.7;
+}
+
+.chat-bubble-container {
+    display: flex;
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .35s ease, transform .35s ease;
+}
+
+.chat-bubble-container.show-message {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.user-row { justify-content: flex-end; }
+.bot-row { justify-content: flex-start; }
+
+.chat-bubble {
+    max-width: 900px;
+    border-radius: 18px;
+    line-height: 1.8;
+    font-size: 15.5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.chat-bubble.bot {
+    width: auto;
+    max-width: 92%;
+    background: rgba(255,255,255,.92);
+    color: #0f172a;
+    border: 1px solid #e8eef5;
+    border-left: 3px solid #d6f5ee;
+    box-shadow: 0 8px 24px rgba(15,23,42,.05);
+    padding: 24px 28px;
+    border-radius: 22px;
+}
+
+.chat-bubble.bot::before {
+    content: "CeraAI";
+    background: #f4fbf8;
+    color: #5b7c73;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.chat-bubble.user {
+    padding: 13px 20px;
+    background: linear-gradient(135deg,#14b8a6,#0f766e);
+    color: white;
+    font-weight: 750;
+    border-radius: 18px 18px 4px 18px;
+    max-width: 220px;
+    text-align: center;
+    box-shadow: 0 10px 24px rgba(59,130,246,.16);
+}
+
+.clean-input-area {
+    position: fixed;
+    left: 30px;
+    right: 30px;
+    bottom: 30px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.clean-input-box {
+    width: 100%;
+    min-height: 62px;
+    padding: 8px 10px 8px 22px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 16px 40px rgba(15,23,42,.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.clean-input-box textarea,
+.clean-input-box textarea:focus {
+    width: 100%;
+    height: 42px;
+    min-height: 42px;
+    max-height: 42px;
+    border: none !important;
+    outline: none !important;
+    resize: none;
+    background: transparent !important;
+    box-shadow: none !important;
+    font-size: 17px;
+    line-height: 42px;
+    color: #172033;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+}
+
+.input-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.send-btn {
+    border: none;
+    cursor: pointer;
+    transition: .25s ease;
+    width: 42px;
+    height: 42px;
+    border-radius: 16px;
+    color: #fff;
+    background: linear-gradient(135deg,#14b8a6,#3b82f6);
+    animation: softGlow 2.5s ease-in-out infinite;
+}
+
+.health-warning {
+    margin-top: 12px;
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.typing-indicator-container {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.typing-indicator {
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+}
+
+.dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: #94a3b8;
+    border-radius: 50%;
+    margin: 0 3px;
+    animation: typingDot 1.2s infinite ease-in-out;
+}
+
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+
+.voice-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,.45);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.voice-box {
+    width: 720px;
+    max-width: 95%;
+    background: rgba(255,255,255,.96);
+    backdrop-filter: blur(24px);
+    border-radius: 34px;
+    padding: 34px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,.7);
+    box-shadow: 0 35px 90px rgba(15,23,42,.25);
+}
+
+.voice-close {
+    float: right;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.voice-icon {
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#14b8a6,#2563eb);
+    color: white;
+    display: grid;
+    place-items: center;
+    margin: 20px auto 18px;
+    font-size: 44px;
+    box-shadow: 0 0 35px rgba(37,99,235,.35);
+}
+
+.voice-icon.listening {
+    animation: voicePulse 1.2s infinite;
+}
+
+.voice-box h3 {
+    font-size: 28px;
+    font-weight: 900;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+#voiceStatus {
+    color: #64748b;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.voice-text {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 18px;
+    border-radius: 22px;
+    margin: 20px 0 22px;
+    color: #1e293b;
+    font-weight: 700;
+    line-height: 1.7;
+    max-height: 290px;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.voice-empty {
+    text-align: center;
+    color: #64748b;
+    font-weight: 800;
+}
+
+.voice-msg {
+    display: flex;
+    margin-bottom: 14px;
+}
+
+.voice-msg.user {
+    justify-content: flex-end;
+}
+
+.voice-msg.ai {
+    justify-content: flex-start;
+}
+
+.voice-msg-bubble {
+    max-width: 82%;
+    padding: 13px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.voice-msg.user .voice-msg-bubble {
+    background: linear-gradient(135deg,#14b8a6,#2563eb);
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.voice-msg.ai .voice-msg-bubble {
+    background: white;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 5px;
+}
+
+.voice-label {
+    display: block;
+    font-size: 11px;
+    opacity: .75;
+    margin-bottom: 4px;
+    font-weight: 900;
+}
+
+.voice-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
+
+.voice-start,
+.voice-stop {
+    width: 62px;
+    height: 62px;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    font-size: 21px;
+    box-shadow: 0 14px 28px rgba(15,23,42,.15);
+}
+
+.voice-start {
+    background: linear-gradient(135deg,#14b8a6,#2563eb);
+}
+
+.voice-stop {
+    background: linear-gradient(135deg,#ef4444,#dc2626);
+}
+
+.news-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.25);
+    backdrop-filter:blur(8px);
+    z-index:9998;
+}
+.news-card{
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    animation: fadeUp .35s ease;
+}
+
+.news-image{
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.news-card h4{
+    font-size: 14px;
+    font-weight: 900;
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+.news-card p{
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.news-card small{
+    display: block;
+    font-size: 11px;
+    color: #0f766e;
+    font-weight: 800;
+}
+
+.news-card a{
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 900;
+    color: #0284c7;
+    text-decoration: none;
+}
+
+@keyframes voicePulse {
+    0% { box-shadow: 0 0 0 0 rgba(37,99,235,.4); }
+    100% { box-shadow: 0 0 0 28px rgba(37,99,235,0); }
+}
+
+@keyframes typingDot {
+    0%,80%,100% { transform: scale(.7); opacity: .45; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes softGlow {
+    0%,100% { box-shadow: 0 0 18px rgba(20,184,166,.25); }
+    50% { box-shadow: 0 0 35px rgba(59,130,246,.45); }
+}
+
+@keyframes cardFloat {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+@keyframes welcomePop {
+    from { opacity: 0; transform: translateY(35px) scale(.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes iconDrop {
+    from { opacity: 0; transform: translateY(-60px) rotate(-120deg); }
+    to { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+
+@media(max-width:1200px) {
+    .right-panel { display: none; }
+
+    .chat-messages {
+        left: 22px;
+        right: 22px;
+        bottom: 140px;
+        padding: 24px;
+    }
+
+    .clean-input-area {
+        left: 22px;
+        right: 22px;
+    }
+
+    .holo-ring {
+        display: none;
+    }
+}
+
+@media(max-width:650px) {
+    .voice-box {
+        padding: 24px;
+        border-radius: 26px;
+    }
+
+    .voice-icon {
+        width: 92px;
+        height: 92px;
+        font-size: 34px;
+    }
+
+    .voice-box h3 {
+        font-size: 22px;
+    }
+
+    .voice-text {
+        max-height: 260px;
+    }
+}
+
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.news-header button {
+    border: none;
+    background: #f1f5f9;
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.news-item {
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.news-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.news-desc {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 5px;
+}
+.hidden {
+    display: none !important;
+}
+.right-panel {
+    transition: all 0.3s ease;
+}
+
+@media(max-width:1200px) {
+    .right-panel {
+        display: none;
+    }
+}
+/* CENTER PROFESSIONAL NEWS MODAL */
+.news-panel {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: 820px !important;
+    max-width: 92vw !important;
+    height: 78vh !important;
+    padding: 22px !important;
+    border-radius: 34px !important;
+    background: rgba(255,255,255,.97) !important;
+    box-shadow: 0 40px 120px rgba(15,23,42,.25) !important;
+    z-index: 9999 !important;
+}
+
+#healthNewsList {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 18px !important;
+}
+
+.news-card {
+    margin: 0 !important;
+    padding: 14px !important;
+}
+
+.news-image {
+    height: 160px !important;
+}
+
+.news-card h4 {
+    font-size: 15px !important;
+}
+
+.news-card p {
+    font-size: 12.5px !important;
+    -webkit-line-clamp: 3 !important;
+}
+
+@media(max-width:700px) {
+    .news-panel {
+        width: 94vw !important;
+        height: 82vh !important;
+    }
+
+    #healthNewsList {
+        grid-template-columns: 1fr !important;
+    }
+}
+.hidden {
+    display: none !important;
+}
+.news-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.25);
+    backdrop-filter:blur(8px);
+    z-index:9998;
+}
+.news-skeleton{
+    height:260px;
+    border-radius:24px;
+    background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);
+    background-size:200% 100%;
+    animation:skeletonMove 1.2s infinite;
+}
+
+@keyframes skeletonMove{
+    from{background-position:200% 0;}
+    to{background-position:-200% 0;}
+}
+/* FIX NEWS MODAL SCROLL */
+.news-panel{
+    overflow:hidden !important;
+    display:flex !important;
+    flex-direction:column !important;
+}
+
+#healthNewsList{
+    flex:1 !important;
+    overflow-y:auto !important;
+    padding-right:8px !important;
+    padding-bottom:20px !important;
+}
+
+#healthNewsList::-webkit-scrollbar{
+    width:8px;
+}
+
+#healthNewsList::-webkit-scrollbar-track{
+    background:#f1f5f9;
+    border-radius:20px;
+}
+
+#healthNewsList::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+    border-radius:20px;
+}
+
+#healthNewsList::-webkit-scrollbar-thumb:hover{
+    background:#94a3b8;
+}
+.news-header button{
+    position:relative !important;
+    z-index:10001 !important;
+    pointer-events:auto !important;
+}
+
+.news-panel{
+    pointer-events:auto !important;
+}
+
+.news-overlay{
+    pointer-events:auto !important;
+}
+.news-header button{
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:50%;
+    background:#f1f5f9;
+    color:#0f172a;
+    font-size:20px;
+    font-weight:900;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.hidden {
+    display: none !important;
+}
+.news-panel{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+
+    transform:translate(-50%,-50%) scale(.88);
+    transition:
+        opacity .28s ease,
+        transform .32s cubic-bezier(.16,1,.3,1),
+        visibility .28s;
+}
+
+.news-overlay{
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .25s ease;
+}
+
+.news-panel.show{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+
+    transform:translate(-50%,-50%) scale(1);
+}
+
+.news-overlay.show{
+    opacity:1;
+    visibility:visible;
+}
+.voice-icon{
+    width:140px;
+    height:140px;
+    font-size:55px;
+}
+#voiceStatus{
+    background:#eefcf9;
+    color:#0f766e;
+    padding:8px 16px;
+    border-radius:50px;
+}
+.voice-text{
+    min-height:250px;
+}
+.voice-modal{
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .35s ease, visibility .35s ease;
+}
+
+.voice-modal:not(.hidden){
+    opacity:1;
+    visibility:visible;
+}
+
+.voice-box{
+    transform:translateY(35px) scale(.92);
+    opacity:0;
+    transition:transform .45s cubic-bezier(.16,1,.3,1), opacity .35s ease;
+}
+
+.voice-modal:not(.hidden) .voice-box{
+    transform:translateY(0) scale(1);
+    opacity:1;
+}
+.voice-modal.closing{
+    opacity:0;
+}
+
+.voice-modal.closing .voice-box{
+    transform:translateY(35px) scale(.92);
+    opacity:0;
+}
+
+
+.voice-modal.hidden {
+    display: none !important;
+}
+
+.voice-modal {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.voice-modal.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.voice-modal.show .voice-box {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.voice-box {
+    opacity: 0;
+    transform: translateY(35px) scale(.92);
+}
+.voice-modal{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .35s ease, visibility .35s ease;
+}
+
+.voice-modal.show{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+}
+
+.voice-box{
+    opacity:0;
+    transform:translateY(35px) scale(.92);
+    transition:opacity .35s ease, transform .45s cubic-bezier(.16,1,.3,1);
+}
+
+.voice-modal.show .voice-box{
+    opacity:1;
+    transform:translateY(0) scale(1);
+
+}
+.voice-modal.hidden {
+    display: none !important;
+}
+
+.voice-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,.45);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .35s ease;
+}
+
+.voice-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.voice-box {
+    transform: translateY(35px) scale(.92);
+    opacity: 0;
+    transition: transform .45s cubic-bezier(.16,1,.3,1), opacity .35s ease;
+}
+
+.voice-modal.show .voice-box {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+.bot-line{
+    opacity:0;
+    transform:translateY(8px);
+    animation:lineFade .35s ease forwards;
+    margin-bottom:10px;
+}
+
+@keyframes lineFade{
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+</style>
+
+<div class="clean-chat-page">
+
+    <div class="futuristic-bg">
+        <span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="holo-ring"></div>
+
+    <header class="clean-topbar">
+        <div class="clean-brand">
+            <div class="brand-orb"><i class="fas fa-heart-pulse"></i></div>
+            <div>
+                <h4>CeraAI</h4>
+                <span>Neural Care Console</span>
+            </div>
+        </div>
+
+        <div class="top-actions">
+
+    <!-- Menu -->
+    <a href="/chatbot" class="new-chat-top" title="New Chat">
+    <i class="fas fa-plus"></i>
+</a>
+
+    <!-- News -->
+    <button type="button" class="new-chat-top" onclick="toggleNewsPanel()" title="Health News">
+        <i class="fas fa-newspaper"></i>
+    </button>
+
+    <!-- Voice -->
+        <button type="button" class="new-chat-top voice-top-btn" onclick="openCeraVoiceOnly()" title="Voice Assistant">        <i class="fas fa-headset"></i>
+    </button>
+
+    <!-- ☎ Emergency Call -->
+    <a href="tel:108" class="new-chat-top" title="Emergency Call">
+        <i class="fas fa-phone"></i>
+    </a>
+
+    <!-- 📍 Hospital Finder -->
+    <button type="button" class="new-chat-top" onclick="findNearestHospital()" title="Find Hospital">
+        <i class="fas fa-location-dot"></i>
+    </button>
+
+    <!-- Profile -->
+    <div class="dropdown">
+        <div class="profile-pill simple-profile"
+             data-bs-toggle="dropdown"
+             aria-expanded="false"
+             style="cursor:pointer;">
+            <div class="user-avatar">{{ current_user.username[0] | upper }}</div>
+        </div>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2">
+            <li>
+                <a class="dropdown-item text-danger fw-bold"
+                   href="{{ url_for('auth.logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+
+</div>
+    </header>
+    <main>
+        <section class="chat-messages" id="chat-messages">
+            <div class="chat-messages-inner">
+
+                {% if not history %}
+                <div class="welcome-state">
+                    <div class="welcome-icon"><i class="fas fa-heart-pulse"></i></div>
+                    <h1>Hello, I'm CeraAI</h1>
+                    <p>Ask me about symptoms, first aid, prevention, disease awareness, or general health doubts.</p>
+                </div>
+                {% endif %}
+
+                {% for chat in history %}
+                <div class="chat-bubble-container show-message {% if chat.sender == 'user' %}user-row{% else %}bot-row{% endif %}">
+                    <div class="chat-bubble {{ chat.sender }}">
+                        {{ chat.message | safe }}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="typing-indicator-container d-none" id="typing-indicator-container">
+                    <div class="typing-indicator">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+        <div id="hospital-map"></div>
+    </main>
+
+    <div class="clean-input-area">
+        <form id="chat-form" class="clean-input-box">
+            <input type="hidden" id="current-conversation-id" value="{{ current_conversation_id or '' }}">
+            <textarea id="chat-input" rows="1" placeholder="Message CeraAI..."></textarea>
+
+            <div class="input-actions">
+                <button type="submit" class="send-btn" title="Send">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+            </div>
+        </form>
+
+        <p class="health-warning">
+            <i class="fas fa-shield-alt"></i>
+            CeraAI can make mistakes. Always check important information with a doctor.
+        </p>
+    </div>
+
+</div>
+
+<div id="voiceAssistantModal" class="voice-modal hidden">
+
+    <div class="voice-box">
+        <button class="voice-close" onclick="closeCeraVoiceOnly()">×</button>
+
+        <div id="voiceIcon" class="voice-icon">
+            <i class="fas fa-microphone"></i>
+        </div>
+
+        <h3>CeraAI Voice Assistant</h3>
+        <h5 id="voiceStatus">Ready to Listen</h5>
+
+        <div id="voiceText" class="voice-text">
+            <div class="voice-empty">
+                Ask your health question by voice...
+            </div>
+        </div>
+
+        <div class="voice-actions">
+            <button type="button" onclick="startCeraVoiceOnly()" class="voice-start">
+                <i class="fas fa-microphone"></i>
+            </button>
+
+            <button type="button" onclick="stopCeraVoiceOnly()" class="voice-stop">
+                <i class="fas fa-stop"></i>
+            </button>
+        </div>
+    </div>
+
+</div>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+let hospitalMap = null;
+let userMarker = null;
+let radiusCircle = null;
+
+let ceraVoiceRecognition = null;
+let voiceConversation = [];
+let isVoiceRunning = false;
+let manualStop = false;
+
+window.addEventListener("load", () => {
+    document.querySelector(".clean-chat-page")?.classList.add("page-ready");
+});
+
+function togglePlusMenu() {
+    document.getElementById("plusMenu")?.classList.toggle("hidden");
+}
+function openCeraVoiceOnly() {
+    const modal = document.getElementById("voiceAssistantModal");
+
+    modal.classList.remove("hidden");
+
+    setTimeout(() => {
+        modal.classList.add("show");
+    }, 10);
+}
+
+function closeCeraVoiceOnly() {
+    const modal = document.getElementById("voiceAssistantModal");
+
+    stopCeraVoiceOnly();
+
+    modal.classList.remove("show");
+
+    setTimeout(() => {
+        modal.classList.add("hidden");
+    }, 350);
+}
+
+
+function detectUserLanguage(text) {
+    const tamilUnicode = /[\u0B80-\u0BFF]/;
+    const tanglishWords = /(enna|epdi|eppadi|iruku|venum|pannu|sollu|naan|enaku|unga|seri|illa|da|bro|machan|kashtam|vali|thala|sapadu|fever|cold)/i;
+
+    if (tamilUnicode.test(text) || tanglishWords.test(text)) {
+        return "tamil";
+    }
+
+    return "english";
+}
+
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.innerText = text || "";
+    return div.innerHTML;
+}
+
+function renderVoiceConversation() {
+    const voiceBox = document.getElementById("voiceText");
+
+    if (!voiceConversation.length) {
+        voiceBox.innerHTML = `<div class="voice-empty">Ask your health question by voice...</div>`;
+        return;
+    }
+
+    voiceBox.innerHTML = voiceConversation.map(item => `
+        <div class="voice-msg ${item.sender}">
+            <div class="voice-msg-bubble">
+                <span class="voice-label">${item.sender === "user" ? "You" : "CeraAI"}</span>
+                ${escapeHtml(item.text)}
+            </div>
+        </div>
+    `).join("");
+
+    voiceBox.scrollTop = voiceBox.scrollHeight;
+}
+
+function startCeraVoiceOnly() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Use Google Chrome for voice assistant.");
+        return;
+    }
+
+    if (isVoiceRunning) return;
+
+    manualStop = false;
+    isVoiceRunning = true;
+    window.speechSynthesis.cancel();
+
+    ceraVoiceRecognition = new SpeechRecognition();
+    ceraVoiceRecognition.lang = "en-IN";
+    ceraVoiceRecognition.continuous = false;
+    ceraVoiceRecognition.interimResults = false;
+
+    document.getElementById("voiceStatus").innerText = "Listening...";
+    document.getElementById("voiceIcon")?.classList.add("listening");
+
+    if (!voiceConversation.length) {
+        document.getElementById("voiceText").innerHTML = `<div class="voice-empty">Speak now...</div>`;
+    }
+
+    try {
+        ceraVoiceRecognition.start();
+    } catch (e) {
+        isVoiceRunning = false;
+        document.getElementById("voiceStatus").innerText = "Ready to Listen";
+        return;
+    }
+
+    ceraVoiceRecognition.onresult = async function(event) {
+        const text = event.results[0][0].transcript;
+        isVoiceRunning = false;
+
+        voiceConversation.push({ sender: "user", text });
+        renderVoiceConversation();
+
+        document.getElementById("voiceStatus").innerText = "CeraAI thinking...";
+        document.getElementById("voiceIcon")?.classList.remove("listening");
+
+        await sendCeraVoiceQuestion(text);
+    };
+
+    ceraVoiceRecognition.onend = function() {
+        isVoiceRunning = false;
+        document.getElementById("voiceIcon")?.classList.remove("listening");
+
+        if (!manualStop) {
+            document.getElementById("voiceStatus").innerText = "Ready to Listen";
+        }
+    };
+
+    ceraVoiceRecognition.onerror = function(event) {
+        isVoiceRunning = false;
+        document.getElementById("voiceIcon")?.classList.remove("listening");
+
+        if (
+            manualStop ||
+            event.error === "aborted" ||
+            event.error === "no-speech"
+        ) {
+            document.getElementById("voiceStatus").innerText = "Ready to Listen";
+            return;
+        }
+
+        document.getElementById("voiceStatus").innerText = "Tap mic and speak again";
+    };
+}
+
+async function sendCeraVoiceQuestion(text) {
+    try {
+        const lang = detectUserLanguage(text);
+
+        const conversationId = document.getElementById("current-conversation-id").value;
+
+const response = await fetch("/api/chat", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+    },
+    body: JSON.stringify({
+        message: message,
+        conversation_id: conversationId || null
+    })
+});
+
+        const data = await response.json();
+
+        const reply =
+            data.response ||
+            data.reply ||
+            data.message ||
+            data.answer ||
+            "Sorry, answer not received.";
+
+        voiceConversation.push({ sender: "ai", text: reply });
+        renderVoiceConversation();
+
+        speakCeraVoice(reply);
+
+    } catch (error) {
+        console.error(error);
+
+        const errorReply = "Sorry, server error. Please try again.";
+        voiceConversation.push({ sender: "ai", text: errorReply });
+        renderVoiceConversation();
+
+        speakCeraVoice(errorReply);
+    }
+}
+if (data.conversation_id) {
+    document.getElementById("current-conversation-id").value = data.conversation_id;
+}
+function stopCeraVoiceOnly() {
+    manualStop = true;
+    isVoiceRunning = false;
+
+    if (ceraVoiceRecognition) {
+        ceraVoiceRecognition.onerror = null;
+        ceraVoiceRecognition.onend = null;
+        try { ceraVoiceRecognition.stop(); } catch(e) {}
+    }
+
+    window.speechSynthesis.cancel();
+
+    document.getElementById("voiceStatus").innerText = "Ready to Listen";
+    document.getElementById("voiceIcon")?.classList.remove("listening");
+}
+
+function speakCeraVoice(text) {
+    window.speechSynthesis.cancel();
+
+    const speech = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+
+    const isTamil = /[\u0B80-\u0BFF]/.test(text);
+
+    const tamilVoice =
+        voices.find(v => v.lang === "ta-IN") ||
+        voices.find(v => v.lang.startsWith("ta"));
+
+    const englishVoice =
+        voices.find(v => v.name.includes("Google UK English Female")) ||
+        voices.find(v => v.name.includes("Google US English")) ||
+        voices.find(v => v.name.includes("Samantha")) ||
+        voices.find(v => v.name.includes("Karen")) ||
+        voices[0];
+
+    if (isTamil && tamilVoice) {
+        speech.voice = tamilVoice;
+        speech.lang = "ta-IN";
+        speech.rate = 0.95;
+        speech.pitch = 1.05;
+    } else {
+        speech.voice = englishVoice;
+        speech.lang = "en-IN";
+        speech.rate = 1.02;
+        speech.pitch = 1.08;
+    }
+
+    speech.volume = 1;
+
+    speech.onstart = () => {
+        document.getElementById("voiceStatus").innerText = "CeraAI speaking...";
+        document.getElementById("voiceIcon")?.classList.add("listening");
+    };
+
+    speech.onend = () => {
+        document.getElementById("voiceStatus").innerText = "Ready to Listen";
+        document.getElementById("voiceIcon")?.classList.remove("listening");
+    };
+
+    window.speechSynthesis.speak(speech);
+}
+
+function findNearestHospital() {
+    window.open("https://www.google.com/maps/search/hospital+near+me", "_blank");
+}
+
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            if (!hospitalMap) {
+                hospitalMap = L.map("hospital-map").setView([lat, lng], 15);
+
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    maxZoom: 19,
+                    attribution: "© OpenStreetMap"
+                }).addTo(hospitalMap);
+            } else {
+                hospitalMap.setView([lat, lng], 15);
+            }
+
+            if (userMarker) hospitalMap.removeLayer(userMarker);
+            if (radiusCircle) hospitalMap.removeLayer(radiusCircle);
+
+            userMarker = L.marker([lat, lng]).addTo(hospitalMap)
+                .bindPopup("You are here")
+                .openPopup();
+
+            radiusCircle = L.circle([lat, lng], {
+                radius: 1000,
+                color: "#14b8a6",
+                fillColor: "#14b8a6",
+                fillOpacity: 0.08
+            }).addTo(hospitalMap);
+
+            setTimeout(() => hospitalMap.invalidateSize(), 300);
+        },
+        function() {
+            window.open("https://www.google.com/maps/search/hospital+near+me", "_blank");
+        }
+    );
+
+function toggleNewsPanel() {
+    const panel = document.getElementById("newsPanel");
+    const overlay = document.getElementById("newsOverlay");
+
+    panel.classList.remove("hidden");
+    overlay.classList.remove("hidden");
+
+    setTimeout(() => {
+        panel.classList.add("show");
+        overlay.classList.add("show");
+    }, 10);
+
+    loadHealthNews();
+}
+
+function closeNewsPanel() {
+    const panel = document.getElementById("newsPanel");
+    const overlay = document.getElementById("newsOverlay");
+
+    panel.classList.remove("show");
+    overlay.classList.remove("show");
+
+    setTimeout(() => {
+        panel.classList.add("hidden");
+        overlay.classList.add("hidden");
+    }, 300);
+}
+
+async function loadHealthNews() {
+    const newsContainer = document.getElementById("healthNewsList");
+
+    newsContainer.innerHTML = `
+        <div class="news-skeleton"></div>
+        <div class="news-skeleton"></div>
+        <div class="news-skeleton"></div>
+        <div class="news-skeleton"></div>
+    `;
+
+    try {
+        const response = await fetch(`/api/health-news?t=${Date.now()}`, {
+            cache: "no-store"
+        });
+
+        const data = await response.json();
+        console.log("Health News:", data);
+
+        if (!data.success || !data.articles || data.articles.length === 0) {
+            newsContainer.innerHTML = "<p>No latest health news found.</p>";
+            return;
+        }
+
+        newsContainer.innerHTML = data.articles.map(article => `
+            <div class="news-card">
+                ${article.image ? `
+                    <img src="${article.image}" class="news-image" alt="News">
+                ` : ""}
+
+                <h4>${article.title || "Health News"}</h4>
+                <p>${article.description || ""}</p>
+                <small>${article.source || "Health News"}</small>
+
+                <a href="${article.link || "#"}" target="_blank">
+                    Read More →
+                </a>
+            </div>
+        `).join("");
+
+    } catch (error) {
+        console.error("News error:", error);
+        newsContainer.innerHTML = "<p>⚠️ Live news failed</p>";
+    }
+}
+async function typeBotLineByLine(botBubble, text) {
+    const chatBox = document.getElementById("chat-messages");
+    botBubble.innerHTML = "";
+
+    const lines = text
+        .replace(/<br\s*\/?>/gi, "\n")
+        .split("\n");
+
+    for (const line of lines) {
+        if (!line.trim()) continue;
+
+        const div = document.createElement("div");
+        div.className = "bot-line";
+        div.innerHTML = line;
+
+        botBubble.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        await new Promise(resolve => setTimeout(resolve, 180));
+    }
+}
+const chatForm = document.getElementById("chat-form");
+const chatInput = document.getElementById("chat-input");
+const chatMessagesInner = document.querySelector(".chat-messages-inner");
+const typingIndicator = document.getElementById("typing-indicator-container");
+
+chatForm.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    chatInput.value = "";
+
+    chatMessagesInner.innerHTML += `
+        <div class="chat-bubble-container show-message user-row">
+            <div class="chat-bubble user">${escapeHtml(message)}</div>
+        </div>
+    `;
+
+    typingIndicator.classList.remove("d-none");
+
+    const response = await fetch(window.location.pathname, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify({ message: message })
+    });
+
+    const data = await response.json();
+    typingIndicator.classList.add("d-none");
+
+    const reply = data.response || data.reply || data.message || data.answer || "Sorry, answer not received.";
+
+    const botRow = document.createElement("div");
+    botRow.className = "chat-bubble-container show-message bot-row";
+
+    const botBubble = document.createElement("div");
+    botBubble.className = "chat-bubble bot";
+
+    botRow.appendChild(botBubble);
+    chatMessagesInner.appendChild(botRow);
+
+    await typeBotLineByLine(botBubble, reply);
+});
+</script>
+<div id="newsOverlay" class="news-overlay hidden" onclick="closeNewsPanel()"></div>
+
+<div id="newsPanel" class="news-panel hidden">
+    <div class="news-header">
+        <div>
+            <h3>Health Intelligence</h3>
+            <small>Latest Medical & Healthcare Updates</small>
+        </div>
+
+       <button type="button" onclick="closeNewsPanel()">×</button>
+    </div>
+
+    <div id="healthNewsList">
+        Loading health news...
+    </div>
+</div>
+
+{% endblock %}

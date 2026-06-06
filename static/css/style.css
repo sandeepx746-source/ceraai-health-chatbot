@@ -1,0 +1,967 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="health-dashboard-page">
+    <div class="bg-circle left"></div>
+    <div class="bg-circle right"></div>
+
+    <div class="container dashboard-container">
+
+        <div class="text-center dash-hero">
+            <span class="dash-pill">
+                <i class="fas fa-user-md"></i>
+                Personal Health Dashboard
+            </span>
+
+            <h1>Track Your <span>Daily Wellness</span></h1>
+
+            <p>
+                Calculate BMI, monitor sleep, check calories, choose your body goal,
+                and track your wellness score.
+            </p>
+        </div>
+
+        <div class="row g-4 align-items-stretch mb-4">
+
+            <div class="col-lg-6">
+                <div class="dash-card top-card">
+                    <div class="card-head">
+                        <div class="icon-box teal">
+                            <i class="fas fa-weight-scale"></i>
+                        </div>
+                        <div>
+                            <h3>BMI Calculator</h3>
+                            <p>Enter your height and weight</p>
+                        </div>
+                    </div>
+
+                    <div class="two-inputs">
+                        <div>
+                            <label>Height (cm)</label>
+                            <input id="heightInput" type="number" placeholder="Example: 175">
+                        </div>
+
+                        <div>
+                            <label>Weight (kg)</label>
+                            <input id="weightInput" type="number" placeholder="Example: 60">
+                        </div>
+                    </div>
+
+                    <button class="main-btn" onclick="calculateBMI()">Calculate BMI</button>
+
+                    <div class="bmi-result">
+                        <h2 id="bmiValue">--</h2>
+                        <p id="bmiStatus">Your BMI result will appear here</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="dash-card top-card">
+                    <div class="card-head">
+                        <div class="icon-box wellness-icon">
+                            <i class="fas fa-heart-pulse"></i>
+                        </div>
+                        <div>
+                            <h3>Health & Wellness Score</h3>
+                            <p>Your overall health overview</p>
+                        </div>
+                    </div>
+
+                    <div class="wellness-content">
+                        <div class="score-circle">
+                            <div>
+                                <h2 id="wellnessScore">82</h2>
+                                <span>/100</span>
+                            </div>
+                        </div>
+
+                        <div class="score-details">
+                            <div class="score-row">
+                                <span><i class="fas fa-moon"></i> Sleep</span>
+                                <div class="bar"><div id="sleepBar" style="width:80%"></div></div>
+                                <b id="sleepScore">80/100</b>
+                            </div>
+
+                            <div class="score-row">
+                                <span><i class="fas fa-utensils"></i> Nutrition</span>
+                                <div class="bar"><div id="nutritionBar" style="width:85%"></div></div>
+                                <b id="nutritionScore">85/100</b>
+                            </div>
+
+                            <div class="score-row">
+                                <span><i class="fas fa-person-running"></i> Activity</span>
+                                <div class="bar"><div id="activityBar" style="width:75%"></div></div>
+                                <b id="activityScore">75/100</b>
+                            </div>
+
+                            <div class="score-row">
+                                <span><i class="fas fa-droplet"></i> Hydration</span>
+                                <div class="bar"><div id="hydrationBar" style="width:90%"></div></div>
+                                <b id="hydrationScore">90/100</b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wellness-status">
+                        <b id="wellnessStatus">Good</b>
+                        <p>Keep up the good work!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-4">
+                <div class="dash-card small-card">
+                    <div class="card-head">
+                        <div class="icon-box purple">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div>
+                            <h3>Sleep Tracker</h3>
+                            <p>Recommended: 7-9 hours</p>
+                        </div>
+                    </div>
+
+                    <label>Hours slept</label>
+                    <input id="sleepInput" type="number" placeholder="Example: 7">
+
+                    <button class="main-btn purple-btn" onclick="checkSleep()">Check Sleep</button>
+
+                    <div class="status-box purple-soft" id="sleepResult">
+                        Enter your sleep hours.
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="dash-card small-card">
+                    <div class="card-head">
+                        <div class="icon-box orange">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div>
+                            <h3>Calories</h3>
+                            <p>Daily calorie tracking</p>
+                        </div>
+                    </div>
+
+                    <label>Calories consumed</label>
+                    <input id="calorieInput" type="number" placeholder="Example: 1800">
+
+                    <button class="main-btn" onclick="checkCalories()">Check Calories</button>
+
+                    <div class="status-box warning" id="calorieResult">
+                        Enter your calories.
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="dash-card small-card">
+                    <div class="card-head">
+                        <div class="icon-box green">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div>
+                            <h3>Body Goal</h3>
+                            <p>Bulking or Fat Cut</p>
+                        </div>
+                    </div>
+
+                    <label>Select Goal</label>
+                    <select id="goalInput">
+                        <option value="">Choose your goal</option>
+                        <option value="bulk">Bulking</option>
+                        <option value="cut">Fat Cut</option>
+                    </select>
+
+                    <button type="button" class="main-btn" onclick="showGoalPlan()">Check Goal</button>
+
+                    <div class="goal-result" id="goalResult">
+                        Select your goal to see weekly plan.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tips-panel mt-5">
+            <div>
+                <h3><i class="fas fa-lightbulb"></i> Today’s Health Tip</h3>
+                <p id="dailyTip">
+                    Drink water regularly, avoid skipping meals, and take short walks between study or work sessions.
+                </p>
+            </div>
+
+            <button class="main-btn tip-button" onclick="newTip()">New Tip</button>
+        </div>
+    </div>
+</section>
+
+<style>
+.health-dashboard-page{
+    min-height:100vh;
+    padding:110px 0 70px;
+    position:relative;
+    overflow:hidden;
+    background:
+    radial-gradient(circle at 0% 10%, rgba(20,184,166,0.40), transparent 30%),
+    radial-gradient(circle at 100% 0%, rgba(37,99,235,0.38), transparent 35%),
+    radial-gradient(circle at 50% 100%, rgba(139,92,246,0.18), transparent 40%),
+    linear-gradient(135deg,#eef8ff 0%,#ffffff 40%,#f0f9ff 70%,#edf4ff 100%);
+}
+
+.bg-circle{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(60px);
+    animation:floatBlob 8s ease-in-out infinite alternate;
+}
+
+.bg-circle.left{
+    width:350px;
+    height:350px;
+    left:-120px;
+    top:-90px;
+    background:rgba(20,184,166,0.35);
+}
+
+.bg-circle.right{
+    width:420px;
+    height:420px;
+    right:-140px;
+    top:20px;
+    background:rgba(37,99,235,0.30);
+    animation-delay:1.5s;
+}
+
+.dashboard-container{
+    position:relative;
+    z-index:2;
+    max-width:1180px;
+    animation:pageReveal 0.9s ease both;
+}
+
+.dash-hero{
+    margin-bottom:45px;
+}
+
+.dash-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 22px;
+    border-radius:999px;
+    background:rgba(20,184,166,0.16);
+    color:#0f766e;
+    font-weight:900;
+    margin-bottom:18px;
+    border:1px solid rgba(20,184,166,0.25);
+}
+
+.dash-hero h1{
+    font-size:clamp(42px,5vw,65px);
+    font-weight:950;
+    letter-spacing:-2px;
+}
+
+.dash-hero h1 span{
+    background:linear-gradient(90deg,#14b8a6,#2563eb,#8b5cf6,#14b8a6);
+    background-size:300%;
+    -webkit-background-clip:text;
+    color:transparent;
+    animation:textGlow 5s linear infinite;
+}
+
+.dash-hero p{
+    max-width:700px;
+    margin:auto;
+    color:#475569;
+    line-height:1.7;
+    font-weight:600;
+}
+
+.dash-card{
+    background:rgba(255,255,255,0.92);
+    border-radius:26px;
+    padding:30px;
+    height:100%;
+    border:1px solid rgba(15,23,42,0.08);
+    box-shadow:0 18px 45px rgba(15,23,42,0.09);
+    transition:0.3s ease;
+}
+
+.dash-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 24px 60px rgba(37,99,235,0.13);
+}
+
+.top-card{
+    min-height:390px;
+}
+
+.small-card{
+    min-height:310px;
+}
+
+.card-head{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    margin-bottom:24px;
+}
+
+.icon-box{
+    width:60px;
+    height:60px;
+    border-radius:18px;
+    display:grid;
+    place-items:center;
+    color:white;
+    font-size:24px;
+    flex-shrink:0;
+}
+
+.teal{ background:linear-gradient(135deg,#14b8a6,#2563eb); }
+.green{ background:linear-gradient(135deg,#22c55e,#16a34a); }
+.purple{ background:linear-gradient(135deg,#7c3aed,#8b5cf6); }
+.orange{ background:linear-gradient(135deg,#f97316,#ef4444); }
+.wellness-icon{ background:linear-gradient(135deg,#10b981,#22c55e); }
+
+.card-head h3{
+    margin:0;
+    font-weight:950;
+}
+
+.card-head p{
+    margin:4px 0 0;
+    color:#667085;
+}
+
+.two-inputs{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:800;
+}
+
+input,
+select{
+    width:100%;
+    height:52px;
+    border-radius:14px;
+    border:1px solid rgba(15,23,42,0.15);
+    padding:0 15px;
+    outline:none;
+    font-weight:700;
+    background:white;
+}
+
+.main-btn{
+    height:50px;
+    border:none;
+    border-radius:14px;
+    padding:0 24px;
+    margin-top:18px;
+    color:white;
+    font-weight:900;
+    background:linear-gradient(135deg,#14b8a6,#2563eb);
+    box-shadow:0 14px 30px rgba(37,99,235,0.18);
+    transition:0.3s ease;
+}
+
+.main-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 18px 40px rgba(37,99,235,0.28);
+}
+
+.bmi-result{
+    margin-top:22px;
+    padding:22px;
+    border-radius:18px;
+    background:rgba(20,184,166,0.12);
+    border:1px solid rgba(20,184,166,0.25);
+    text-align:center;
+}
+
+.bmi-result h2{
+    font-size:42px;
+    font-weight:950;
+    margin:0;
+}
+
+.bmi-result p{
+    margin:5px 0 0;
+    font-weight:800;
+    color:#475467;
+}
+
+.wellness-content{
+    display:flex;
+    align-items:center;
+    gap:35px;
+    margin-top:25px;
+}
+
+.score-circle{
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    background:conic-gradient(#22c55e 0deg 295deg,#e8eef5 295deg 360deg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    flex-shrink:0;
+}
+
+.score-circle::before{
+    content:"";
+    width:115px;
+    height:115px;
+    background:white;
+    border-radius:50%;
+    position:absolute;
+}
+
+.score-circle div{
+    position:relative;
+    text-align:center;
+}
+
+.score-circle h2{
+    font-size:42px;
+    margin:0;
+    color:#071233;
+    font-weight:950;
+}
+
+.score-circle span{
+    font-weight:700;
+    color:#64748b;
+}
+
+.score-details{
+    flex:1;
+}
+
+.score-row{
+    display:grid;
+    grid-template-columns:110px 1fr 70px;
+    align-items:center;
+    gap:14px;
+    margin-bottom:18px;
+    font-size:14px;
+}
+
+.score-row span{
+    color:#334155;
+    font-weight:700;
+}
+
+.score-row i{
+    color:#0ea5e9;
+    margin-right:8px;
+}
+
+.bar{
+    height:8px;
+    background:#e8eef5;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.bar div{
+    height:100%;
+    background:linear-gradient(90deg,#22c55e,#38bdf8);
+    border-radius:20px;
+}
+
+.score-row b{
+    color:#0f172a;
+    font-size:13px;
+}
+
+.wellness-status{
+    text-align:center;
+    margin-top:15px;
+}
+
+.wellness-status b{
+    color:#22c55e;
+    font-size:17px;
+}
+
+.wellness-status p{
+    margin:4px 0 0;
+    font-weight:700;
+    color:#667085;
+}
+
+.status-box,
+.goal-result{
+    margin-top:22px;
+    padding:16px;
+    border-radius:14px;
+    font-weight:800;
+    line-height:1.6;
+}
+
+.goal-result{
+    height:150px;
+    overflow-y:auto;
+    background:rgba(34,197,94,0.08);
+    border:1px solid rgba(34,197,94,0.20);
+}
+
+.purple-soft{
+    background:rgba(124,58,237,0.10);
+}
+
+.warning{
+    background:rgba(245,158,11,0.10);
+}
+
+.tips-panel{
+    position:relative;
+    z-index:2;
+    padding:28px;
+    border-radius:26px;
+    background:rgba(255,255,255,0.92);
+    border:1px solid rgba(15,23,42,0.08);
+    box-shadow:0 18px 45px rgba(15,23,42,0.09);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.tips-panel h3{
+    margin:0 0 8px;
+    font-weight:950;
+}
+
+.tips-panel p{
+    margin:0;
+    color:#667085;
+}
+
+.tip-button{
+    margin-top:0;
+    white-space:nowrap;
+    min-width:130px;
+}
+
+.section-title{
+    font-size:clamp(38px,4vw,58px);
+    font-weight:900;
+    color:#0f172a;
+    margin-bottom:12px;
+}
+
+.section-title span{
+    background:linear-gradient(90deg,#14b8a6,#2563eb);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.section-subtitle{
+    color:#64748b;
+    font-size:18px;
+    max-width:700px;
+    margin:auto;
+}
+
+.feature-card{
+    background:rgba(255,255,255,0.55)!important;
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.7)!important;
+    transition:all .4s ease;
+    overflow:hidden;
+    position:relative;
+}
+
+.feature-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg, rgba(20,184,166,.12), rgba(37,99,235,.12));
+    opacity:0;
+    transition:.4s;
+}
+
+.feature-card:hover::before{
+    opacity:1;
+}
+
+.feature-card:hover{
+    transform:translateY(-14px) scale(1.03);
+    box-shadow:
+        0 20px 40px rgba(37,99,235,.15),
+        0 0 30px rgba(20,184,166,.15)!important;
+}
+
+@keyframes pageReveal{
+    from{
+        opacity:0;
+        transform:translateY(40px) scale(.96);
+        filter:blur(12px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+        filter:blur(0);
+    }
+}
+
+@keyframes floatBlob{
+    from{
+        transform:translateY(0) translateX(0);
+    }
+    to{
+        transform:translateY(-40px) translateX(30px);
+    }
+}
+
+@keyframes textGlow{
+    from{
+        background-position:0%;
+    }
+    to{
+        background-position:300%;
+    }
+}
+
+@media(max-width:992px){
+    .wellness-content{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .score-row{
+        grid-template-columns:1fr;
+        gap:8px;
+        width:100%;
+    }
+}
+
+@media(max-width:768px){
+    .two-inputs{
+        grid-template-columns:1fr;
+    }
+
+    .top-card{
+        min-height:auto;
+    }
+
+    .tips-panel{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+</style>
+
+<script>
+function calculateBMI(){
+    const h = Number(document.getElementById("heightInput").value);
+    const w = Number(document.getElementById("weightInput").value);
+
+    if(!h || !w){
+        document.getElementById("bmiValue").innerText = "--";
+        document.getElementById("bmiStatus").innerText = "Please enter height and weight";
+        return;
+    }
+
+    const bmi = w / ((h / 100) * (h / 100));
+
+    document.getElementById("bmiValue").innerText = bmi.toFixed(1);
+
+    if(bmi < 18.5){
+        document.getElementById("bmiStatus").innerText = "Underweight range";
+    }
+    else if(bmi < 25){
+        document.getElementById("bmiStatus").innerText = "Normal range";
+    }
+    else if(bmi < 30){
+        document.getElementById("bmiStatus").innerText = "Overweight range";
+    }
+    else{
+        document.getElementById("bmiStatus").innerText = "Obesity range";
+    }
+}
+
+function updateWellnessScore(){
+    const sleep = Number(document.getElementById("sleepInput").value) || 7;
+    const calories = Number(document.getElementById("calorieInput").value) || 1800;
+
+    let sleepScore = sleep >= 7 && sleep <= 9 ? 90 : sleep >= 6 && sleep <= 10 ? 75 : 55;
+    let nutritionScore = calories >= 1500 && calories <= 2500 ? 85 : 60;
+    let activityScore = 75;
+    let hydrationScore = 90;
+
+    let total = Math.round((sleepScore + nutritionScore + activityScore + hydrationScore) / 4);
+
+    document.getElementById("wellnessScore").innerText = total;
+    document.getElementById("sleepScore").innerText = sleepScore + "/100";
+    document.getElementById("nutritionScore").innerText = nutritionScore + "/100";
+    document.getElementById("activityScore").innerText = activityScore + "/100";
+    document.getElementById("hydrationScore").innerText = hydrationScore + "/100";
+
+    document.getElementById("sleepBar").style.width = sleepScore + "%";
+    document.getElementById("nutritionBar").style.width = nutritionScore + "%";
+    document.getElementById("activityBar").style.width = activityScore + "%";
+    document.getElementById("hydrationBar").style.width = hydrationScore + "%";
+
+    const degree = Math.round((total / 100) * 360);
+    document.querySelector(".score-circle").style.background =
+        `conic-gradient(#22c55e 0deg ${degree}deg, #e8eef5 ${degree}deg 360deg)`;
+
+    document.getElementById("wellnessStatus").innerText =
+        total >= 80 ? "Good" : total >= 60 ? "Average" : "Needs Improvement";
+}
+
+function checkSleep(){
+    const sleep = Number(document.getElementById("sleepInput").value);
+    const result = document.getElementById("sleepResult");
+
+    if(!sleep){
+        result.innerText = "Please enter sleep hours";
+    }
+    else if(sleep < 6){
+        result.innerText = "Low sleep. Try resting more.";
+    }
+    else if(sleep <= 9){
+        result.innerText = "Good sleep routine.";
+    }
+    else{
+        result.innerText = "Too much sleep. Keep a balanced routine.";
+    }
+
+    updateWellnessScore();
+}
+
+function checkCalories(){
+    const calories = Number(document.getElementById("calorieInput").value);
+    const result = document.getElementById("calorieResult");
+
+    if(!calories){
+        result.innerText = "Please enter calories";
+    }
+    else if(calories < 1500){
+        result.innerText = "Low calorie intake. Eat balanced meals.";
+    }
+    else if(calories <= 2500){
+        result.innerText = "Balanced calorie range.";
+    }
+    else{
+        result.innerText = "High intake. Balance with activity.";
+    }
+
+    updateWellnessScore();
+}
+
+function showGoalPlan(){
+    const goal = document.getElementById("goalInput").value;
+    const result = document.getElementById("goalResult");
+
+    if(goal === "bulk"){
+        result.innerHTML =
+        "<b>Bulking Weekly Plan</b><br><br>" +
+        "Calories: 2500-2800/day<br>" +
+        "Protein: 80-100g/day<br><br>" +
+        "<b>Workout:</b><br>" +
+        "Mon: Chest + Triceps<br>" +
+        "Tue: Back + Biceps<br>" +
+        "Wed: Rest<br>" +
+        "Thu: Legs + Core<br>" +
+        "Fri: Shoulders<br>" +
+        "Sat: Full body<br>" +
+        "Sun: Rest<br><br>" +
+        "<b>Foods:</b><br>" +
+        "Rice, Eggs, Milk, Banana, Chicken/Paneer, Peanut butter";
+    }
+    else if(goal === "cut"){
+        result.innerHTML =
+        "<b>Fat Cut Weekly Plan</b><br><br>" +
+        "Calories: 1700-2000/day<br>" +
+        "Protein: 80-100g/day<br><br>" +
+        "<b>Workout:</b><br>" +
+        "Mon: Walking + Core<br>" +
+        "Tue: HIIT + Squats<br>" +
+        "Wed: Jogging<br>" +
+        "Thu: Push-ups + Lunges<br>" +
+        "Fri: Full body circuit<br>" +
+        "Sat: Cardio<br>" +
+        "Sun: Rest<br><br>" +
+        "<b>Foods:</b><br>" +
+        "Eggs, Vegetables, Dal, Chicken/Paneer, Oats";
+    }
+    else{
+        result.innerText = "Please select your goal.";
+    }
+}
+
+const tips = [
+    "Drink water regularly, avoid skipping meals, and take short walks between study or work sessions.",
+    "Sleep at the same time daily for better recovery.",
+    "Eat fruits or protein-rich snacks instead of junk food.",
+    "Do 20-30 minutes of light activity daily.",
+    "Avoid self-medication and consult a doctor for serious symptoms.",
+    "Take a 5-minute walk after long sitting sessions."
+];
+
+function newTip(){
+    const random = Math.floor(Math.random() * tips.length);
+    document.getElementById("dailyTip").innerText = tips[random];
+}
+</script>
+{% endblock %}
+/* STARTUP SCREEN FINAL */
+
+#startup-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: #ffffff;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.startup-logo {
+    width: 110px;
+    height: 110px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    color: white;
+    background: linear-gradient(135deg, #14b8a6, #3b82f6);
+    animation: logoPop 1s ease, logoGlow 1.4s ease-in-out infinite;
+}
+
+.startup-logo i {
+    color: white;
+}
+
+#startup-screen h1 {
+    margin: 0;
+    font-size: 48px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+#startup-screen p {
+    margin: 0;
+    color: #64748b;
+    font-size: 16px;
+}
+
+.hide-splash {
+    animation: splashOut .9s ease forwards;
+}
+
+@keyframes logoPop {
+    0% {
+        opacity: 0;
+        transform: scale(.4) rotate(-120deg);
+    }
+
+    70% {
+        opacity: 1;
+        transform: scale(1.12) rotate(8deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0);
+    }
+}
+
+@keyframes logoGlow {
+    0%, 100% {
+        box-shadow: 0 0 22px rgba(20,184,166,.35);
+    }
+
+    50% {
+        box-shadow: 0 0 60px rgba(59,130,246,.65);
+    }
+}
+
+@keyframes splashOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(1.12);
+        filter: blur(14px);
+        visibility: hidden;
+    }
+}
+.google-btn {
+    margin-top: 14px;
+    width: 100%;
+    height: 48px;
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    color: #172033;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(15,23,42,.06);
+}
+
+.google-btn:hover {
+    background: #f8fafc;
+    color: #172033;
+}
+.google-logo{
+    width:22px;
+    height:22px;
+    object-fit:contain;
+}
+
+.google-btn{
+    width:100%;
+    height:52px;
+    border-radius:999px;
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    color:#172033;
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    text-decoration:none;
+    box-shadow:0 12px 28px rgba(15,23,42,.08);
+    transition:.3s ease;
+}
+
+.google-btn:hover{
+    background:#f8fafc;
+    color:#172033;
+    transform:translateY(-2px);
+}
+.google-logo{
+    width:22px;
+    height:22px;
+    object-fit:contain;
+}
