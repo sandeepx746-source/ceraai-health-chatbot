@@ -1,0 +1,738 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+body{
+    background:#f5f8fc;
+}
+
+.medical-page{
+    min-height:100vh;
+    padding:1px 24px 80px;
+    background:
+        radial-gradient(circle at 12% 12%, rgba(20,184,166,.12), transparent 30%),
+        radial-gradient(circle at 86% 16%, rgba(37,99,235,.12), transparent 34%),
+        #f5f8fc;
+
+    opacity:0;
+    transform:translateY(24px) scale(.98);
+}
+
+.medical-page.page-ready{
+    animation:hubPageOpen .75s ease forwards;
+}
+
+.medical-shell{
+    max-width:1320px;
+    margin:auto;
+}
+
+.hero{
+    text-align:center;
+    margin-bottom:34px;
+}
+
+.hero-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 18px;
+    border-radius:999px;
+    background:white;
+    color:#0f766e;
+    font-weight:950;
+    margin-bottom:14px;
+    box-shadow:0 12px 30px rgba(15,23,42,.06);
+    opacity:0;
+    animation:fadeDrop .55s ease forwards .15s;
+}
+
+.hero h1{
+    font-size:48px;
+    font-weight:950;
+    color:#0f172a;
+    margin:0;
+    opacity:0;
+    animation:fadeDrop .65s ease forwards .28s;
+}
+
+.hero p{
+    color:#64748b;
+    font-size:17px;
+    margin-top:10px;
+    font-weight:700;
+    opacity:0;
+    animation:fadeDrop .65s ease forwards .42s;
+}
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:28px;
+}
+
+.stat-card{
+    background:white;
+    border-radius:26px;
+    padding:24px;
+    border:1px solid #e2e8f0;
+    box-shadow:0 18px 50px rgba(15,23,42,.06);
+    opacity:0;
+    transform:translateY(28px);
+    animation:cardReveal .65s ease forwards;
+}
+
+.stat-card:nth-child(1){animation-delay:.20s}
+.stat-card:nth-child(2){animation-delay:.30s}
+.stat-card:nth-child(3){animation-delay:.40s}
+.stat-card:nth-child(4){animation-delay:.50s}
+
+.stat-card h3{
+    font-size:34px;
+    margin:0;
+    color:#0f172a;
+    font-weight:950;
+}
+
+.stat-card p{
+    margin:8px 0 0;
+    color:#64748b;
+    font-weight:850;
+}
+
+.main-grid{
+    display:grid;
+    grid-template-columns:2fr .95fr;
+    gap:22px;
+    align-items:start;
+}
+
+.card{
+    background:white;
+    border-radius:30px;
+    padding:26px;
+    border:1px solid #e2e8f0;
+    box-shadow:0 22px 60px rgba(15,23,42,.07);
+    opacity:0;
+    transform:translateY(28px);
+    animation:cardReveal .65s ease forwards;
+}
+
+.main-grid > .card{animation-delay:.62s}
+.main-grid > div .card{animation-delay:.76s}
+
+.card-title{
+    font-size:25px;
+    font-weight:950;
+    color:#0f172a;
+    margin-bottom:8px;
+}
+
+.section-subtitle{
+    color:#64748b;
+    font-weight:750;
+    margin:0 0 22px;
+    line-height:1.6;
+}
+
+.mapper-box{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.mapper-box input{
+    border:1px solid #dbe5f0;
+    border-radius:18px;
+    padding:16px 18px;
+    outline:none;
+    font-size:15px;
+    font-weight:850;
+    color:#0f172a;
+    background:#f8fafc;
+}
+
+.mapper-box button{
+    border:none;
+    border-radius:18px;
+    padding:0 24px;
+    background:linear-gradient(135deg,#14b8a6,#2563eb);
+    color:white;
+    font-weight:950;
+    box-shadow:0 14px 28px rgba(37,99,235,.18);
+}
+
+.result-panel{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:20px;
+}
+
+.result-card{
+    border-radius:24px;
+    padding:20px;
+    background:linear-gradient(180deg,#f8fbff,#ffffff);
+    border:1px solid #e2e8f0;
+    opacity:0;
+    transform:translateY(18px);
+    animation:cardReveal .55s ease forwards;
+}
+
+.result-card:nth-child(1){animation-delay:.85s}
+.result-card:nth-child(2){animation-delay:.95s}
+
+.result-card span{
+    display:inline-flex;
+    width:48px;
+    height:48px;
+    border-radius:16px;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#14b8a6,#2563eb);
+    color:white;
+    font-size:24px;
+    margin-bottom:12px;
+}
+
+.result-card h4{
+    margin:0 0 8px;
+    color:#0f172a;
+    font-size:21px;
+    font-weight:950;
+}
+
+.result-card p{
+    margin:0;
+    color:#475569;
+    font-weight:750;
+    line-height:1.65;
+}
+
+.pathway{
+    border-radius:26px;
+    padding:22px;
+    background:#0f172a;
+    color:white;
+    margin-bottom:20px;
+    overflow:hidden;
+    opacity:0;
+    transform:translateY(18px);
+    animation:cardReveal .55s ease forwards 1.05s;
+}
+
+.pathway h3{
+    margin:0 0 18px;
+    font-size:22px;
+    font-weight:950;
+}
+
+.pathway-steps{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.path-step{
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:18px;
+    padding:14px;
+}
+
+.path-step b{
+    display:block;
+    color:white;
+    margin-bottom:6px;
+}
+
+.path-step small{
+    color:#cbd5e1;
+    line-height:1.5;
+    font-weight:700;
+}
+
+.knowledge-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+}
+
+.knowledge-card{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    border:1px solid #e2e8f0;
+    border-radius:22px;
+    padding:18px;
+    background:linear-gradient(180deg,#ffffff,#f8fbff);
+    transition:.3s ease;
+    opacity:0;
+    transform:translateY(18px);
+    animation:cardReveal .55s ease forwards;
+}
+
+.knowledge-card:nth-child(1){animation-delay:1.15s}
+.knowledge-card:nth-child(2){animation-delay:1.25s}
+
+.knowledge-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 18px 42px rgba(15,23,42,.09);
+}
+
+.knowledge-icon{
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    display:grid;
+    place-items:center;
+    font-size:27px;
+    background:#ecfeff;
+    color:#0f766e;
+    flex-shrink:0;
+}
+
+.knowledge-info h4{
+    margin:0;
+    color:#0f172a;
+    font-size:18px;
+    font-weight:950;
+}
+
+.knowledge-info p{
+    color:#64748b;
+    margin:7px 0 12px;
+    font-size:13.5px;
+    font-weight:700;
+    line-height:1.55;
+}
+
+.knowledge-btn{
+    display:inline-block;
+    text-decoration:none;
+    color:white;
+    background:linear-gradient(135deg,#14b8a6,#2563eb);
+    padding:9px 14px;
+    border-radius:12px;
+    font-weight:900;
+}
+
+.resource-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.resource-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:16px;
+    border-radius:18px;
+    background:#f8fafc;
+    border:1px solid #eef2f7;
+    text-decoration:none;
+    color:#0f172a;
+    font-weight:900;
+    transition:.25s ease;
+    opacity:0;
+    transform:translateY(18px);
+    animation:cardReveal .55s ease forwards;
+}
+
+.resource-item:nth-child(1){animation-delay:.9s}
+.resource-item:nth-child(2){animation-delay:1s}
+.resource-item:nth-child(3){animation-delay:1.1s}
+.resource-item:nth-child(4){animation-delay:1.2s}
+.resource-item:nth-child(5){animation-delay:1.3s}
+
+.resource-item:hover{
+    background:#ecfeff;
+    transform:translateX(3px);
+}
+
+.resource-item small{
+    color:#64748b;
+    font-size:12px;
+    font-weight:800;
+}
+
+.quick-actions{
+    margin-top:20px;
+    padding:20px;
+    border-radius:24px;
+    background:linear-gradient(180deg,#0f172a,#1e293b);
+    color:white;
+    opacity:0;
+    transform:translateY(18px);
+    animation:cardReveal .55s ease forwards 1.35s;
+}
+
+.quick-actions h3{
+    font-size:21px;
+    font-weight:950;
+    margin:0 0 14px;
+}
+
+.quick-actions a{
+    display:block;
+    padding:14px;
+    border-radius:16px;
+    background:rgba(255,255,255,.08);
+    color:white;
+    text-decoration:none;
+    font-weight:850;
+    margin-bottom:10px;
+}
+
+.quick-actions small{
+    display:block;
+    color:#cbd5e1;
+    margin-top:4px;
+    font-size:12px;
+}
+
+@keyframes hubPageOpen{
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+@keyframes cardReveal{
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes fadeDrop{
+    from{
+        opacity:0;
+        transform:translateY(-18px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@media(max-width:1050px){
+    .stats-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .main-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:720px){
+    .medical-page{
+        padding:95px 14px 60px;
+    }
+
+    .hero h1{
+        font-size:34px;
+    }
+
+    .stats-grid,
+    .result-panel,
+    .knowledge-grid,
+    .pathway-steps{
+        grid-template-columns:1fr;
+    }
+
+    .mapper-box{
+        grid-template-columns:1fr;
+    }
+
+    .mapper-box button{
+        padding:15px;
+    }
+}
+</style>
+
+<div class="medical-page">
+    <div class="medical-shell">
+
+        <div class="hero">
+            <div class="hero-badge">🩺 Clinical Intelligence Workspace</div>
+
+            <h1>CeraAI Medical Hub</h1>
+
+            <p>
+                AI-powered symptom mapping, clinical pathways,
+                trusted resources, and visual health learning.
+            </p>
+        </div>
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <h3>AI</h3>
+                <p>Symptom Mapping</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>200+</h3>
+                <p>Disease Learning Paths</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>24/7</h3>
+                <p>Health Guidance</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>WHO</h3>
+                <p>Trusted Resources</p>
+            </div>
+
+        </div>
+
+        <div class="main-grid">
+
+            <div class="card">
+                <div class="card-title">
+                    🧬 AI Symptom-to-System Mapper
+                </div>
+
+                <p class="section-subtitle">
+                    Enter a symptom and CeraAI maps it to the likely body system,
+                    clinical focus, and recommended learning path.
+                </p>
+
+                <div class="mapper-box">
+                    <input id="symptomInput" placeholder="Type symptom... chest pain, cough, headache, fever">
+                    <button onclick="mapSymptom()">Map Symptom</button>
+                </div>
+
+                <div class="result-panel">
+
+                    <div class="result-card">
+                        <span id="systemIcon">📌</span>
+                        <h4 id="systemTitle">Waiting for symptom</h4>
+                        <p id="systemText">
+                            Type any symptom above to get body-system based guidance.
+                        </p>
+                    </div>
+
+                    <div class="result-card">
+                        <span>🩺</span>
+                        <h4 id="focusTitle">Clinical Focus</h4>
+                        <p id="focusText">
+                            CeraAI will suggest what area to focus on for learning and awareness.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="pathway">
+                    <h3>Clinical Pathway</h3>
+
+                    <div class="pathway-steps">
+                        <div class="path-step">
+                            <b>1. Symptom</b>
+                            <small id="stepSymptom">Enter symptom</small>
+                        </div>
+
+                        <div class="path-step">
+                            <b>2. Body System</b>
+                            <small id="stepSystem">Mapped system appears here</small>
+                        </div>
+
+                        <div class="path-step">
+                            <b>3. Learning Path</b>
+                            <small id="stepLearning">Open visual learning module</small>
+                        </div>
+
+                        <div class="path-step">
+                            <b>4. Action</b>
+                            <small id="stepAction">Ask CeraAI or consult doctor if needed</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="knowledge-grid">
+
+                    <div class="knowledge-card">
+                        <div class="knowledge-icon">🎓</div>
+
+                        <div class="knowledge-info">
+                            <h4>Open Visual Learning</h4>
+                            <p>
+                                Search the mapped condition in the learning dashboard
+                                and watch medical visual explanations.
+                            </p>
+                            <a href="/learning" class="knowledge-btn">Learning Center</a>
+                        </div>
+                    </div>
+
+                    <div class="knowledge-card">
+                        <div class="knowledge-icon">🤖</div>
+
+                        <div class="knowledge-info">
+                            <h4>Ask CeraAI</h4>
+                            <p>
+                                Use the chatbot for simple explanation, prevention steps,
+                                and safe next-step guidance.
+                            </p>
+                            <a href="/chatbot" class="knowledge-btn">Open Chatbot</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div>
+
+                <div class="card">
+                    <div class="card-title">
+                        🔗 Trusted Resources
+                    </div>
+
+                    <div class="resource-list">
+
+                        <a href="https://www.who.int" target="_blank" class="resource-item">
+                            <span>🌍 WHO</span>
+                            <small>Global Health</small>
+                        </a>
+
+                        <a href="https://www.cdc.gov" target="_blank" class="resource-item">
+                            <span>🏥 CDC</span>
+                            <small>Disease Control</small>
+                        </a>
+
+                        <a href="https://www.nih.gov" target="_blank" class="resource-item">
+                            <span>📚 NIH</span>
+                            <small>Research</small>
+                        </a>
+
+                        <a href="/learning" class="resource-item">
+                            <span>🎓 Learning Center</span>
+                            <small>Visual Lessons</small>
+                        </a>
+
+                        <a href="/chatbot" class="resource-item">
+                            <span>🤖 AI Health Assistant</span>
+                            <small>Ask CeraAI</small>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h3>Next Best Actions</h3>
+
+                    <a href="/learning">
+                        🎓 Visual Disease Learning
+                        <small>Understand disease with video and explanation</small>
+                    </a>
+
+                    <a href="/chatbot">
+                        🤖 Ask CeraAI
+                        <small>Ask symptoms, prevention, and first-aid doubts</small>
+                    </a>
+
+                    <a href="https://www.google.com/maps/search/hospital+near+me" target="_blank">
+                        📍 Nearby Hospitals
+                        <small>Open nearby hospital search</small>
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+window.addEventListener("load", () => {
+    document.querySelector(".medical-page")?.classList.add("page-ready");
+});
+
+function mapSymptom(){
+    const input = document.getElementById("symptomInput").value.toLowerCase().trim();
+
+    if(!input){
+        alert("Enter symptom");
+        return;
+    }
+
+    let icon = "📌";
+    let system = "General Health System";
+    let systemText = "This symptom may need basic health evaluation and general clinical awareness.";
+    let focus = "General health checkup, symptom duration, hydration, rest, and monitoring.";
+    let learning = "General health awareness";
+    let action = "Ask CeraAI for simple guidance. Consult a doctor if symptoms continue.";
+
+    if(input.includes("chest") || input.includes("heart") || input.includes("bp") || input.includes("pressure")){
+        icon = "❤️";
+        system = "Cardiovascular System";
+        systemText = "This symptom may be related to heart function, blood pressure, or blood circulation.";
+        focus = "Heart rhythm, BP awareness, chest discomfort pattern, ECG basics, and warning signs.";
+        learning = "Heart health and blood pressure module";
+        action = "If chest pain is severe or sudden, seek medical help immediately.";
+    }
+    else if(input.includes("head") || input.includes("migraine") || input.includes("dizziness") || input.includes("nerve")){
+        icon = "🧠";
+        system = "Neurological System";
+        systemText = "This symptom may be related to brain, nerves, balance, or headache patterns.";
+        focus = "Headache type, dizziness, nerve signals, sleep pattern, and neurological warning signs.";
+        learning = "Neurology and headache awareness module";
+        action = "Track duration and severity. Ask CeraAI for symptom explanation.";
+    }
+    else if(input.includes("cough") || input.includes("breath") || input.includes("asthma") || input.includes("wheezing")){
+        icon = "🫁";
+        system = "Respiratory System";
+        systemText = "This symptom may be related to lungs, airway irritation, oxygen flow, or breathing pattern.";
+        focus = "Cough type, breathing difficulty, asthma awareness, oxygen flow, and lung care.";
+        learning = "Respiratory health learning module";
+        action = "If breathing difficulty is severe, seek urgent medical help.";
+    }
+    else if(input.includes("fever") || input.includes("infection") || input.includes("cold") || input.includes("chills")){
+        icon = "🦠";
+        system = "Infectious Disease Pathway";
+        systemText = "This symptom may be related to immune response, infection, fever pattern, or inflammation.";
+        focus = "Temperature tracking, infection awareness, hydration, hygiene, and warning symptoms.";
+        learning = "Fever and infection visual module";
+        action = "Monitor temperature and consult a doctor if fever is high or prolonged.";
+    }
+    else if(input.includes("stomach") || input.includes("vomit") || input.includes("diarrhea") || input.includes("abdomen")){
+        icon = "🍽️";
+        system = "Digestive System";
+        systemText = "This symptom may be related to stomach, intestine, food reaction, or hydration imbalance.";
+        focus = "Food history, dehydration signs, stomach pain location, vomiting, and digestion.";
+        learning = "Digestive health learning module";
+        action = "Focus on hydration and consult a doctor if symptoms are severe.";
+    }
+    else if(input.includes("skin") || input.includes("rash") || input.includes("itch") || input.includes("allergy")){
+        icon = "🧴";
+        system = "Skin & Allergy System";
+        systemText = "This symptom may be related to skin irritation, allergy, infection, or immune reaction.";
+        focus = "Rash pattern, allergy triggers, itching, swelling, hygiene, and skin protection.";
+        learning = "Skin allergy and dermatology awareness module";
+        action = "Avoid scratching and consult a dermatologist if spreading or severe.";
+    }
+
+    document.getElementById("systemIcon").innerText = icon;
+    document.getElementById("systemTitle").innerText = system;
+    document.getElementById("systemText").innerText = systemText;
+
+    document.getElementById("focusTitle").innerText = "Clinical Focus";
+    document.getElementById("focusText").innerText = focus;
+
+    document.getElementById("stepSymptom").innerText = input;
+    document.getElementById("stepSystem").innerText = system;
+    document.getElementById("stepLearning").innerText = learning;
+    document.getElementById("stepAction").innerText = action;
+}
+</script>
+
+{% endblock %}
