@@ -32,7 +32,7 @@ def create_app(config_class=Config):
             if not api_key:
                 return jsonify({
                     "success": False,
-                    "error": "GNEWS_API_KEY missing in .env"
+                    "error": "GNEWS_API_KEY missing"
                 }), 500
 
             url = "https://gnews.io/api/v4/top-headlines"
@@ -81,7 +81,7 @@ def create_app(config_class=Config):
                 "error": str(e)
             }), 500
 
-        with app.app_context():
+    with app.app_context():
         db.create_all()
 
     return app
